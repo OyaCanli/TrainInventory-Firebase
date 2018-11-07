@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.canli.oya.traininventory">
+    package="com.canli.oya.traininventoryfirebase">
 
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -18,7 +19,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".ui.MainActivity"
+        <activity android:name="com.canli.oya.traininventoryfirebase.ui.MainActivity"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +30,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.canli.oya.traininventory.fileprovider"
+            android:authorities="com.canli.oya.traininventoryfirebase.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

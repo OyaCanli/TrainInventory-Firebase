@@ -6,13 +6,13 @@
     <data>
         <variable
             name="train"
-            type="com.canli.oya.traininventory.data.entities.TrainEntry"/>
+            type="com.canli.oya.traininventoryfirebase.data.model.Train"/>
 
         <variable
             name="trainItemClick"
-            type="com.canli.oya.traininventory.adapters.TrainAdapter.TrainItemClickListener" />
+            type="com.canli.oya.traininventoryfirebase.adapters.TrainAdapter.TrainItemClickListener" />
 
-        <import type="com.canli.oya.traininventory.utils.DataBindingUtils" />
+        <import type="com.canli.oya.traininventoryfirebase.utils.DataBindingUtils" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -24,7 +24,7 @@
         android:layout_marginTop="@dimen/half_margin"
         android:background="@drawable/train_item_background"
         android:padding="@dimen/half_padding"
-        android:onClick="@{() ->  trainItemClick.onListItemClick(train.trainId)}">
+        android:onClick="@{() ->  trainItemClick.onListItemClick()}">
 
         <TextView
             android:id="@+id/train_item_train_name"

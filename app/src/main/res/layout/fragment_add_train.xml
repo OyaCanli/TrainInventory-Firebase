@@ -6,13 +6,13 @@
     <data>
         <variable
             name="chosenTrain"
-            type="com.canli.oya.traininventory.data.entities.TrainEntry" />
+            type="com.canli.oya.traininventoryfirebase.data.model.Train" />
 
         <variable
             name="isEdit"
             type="boolean" />
 
-        <import type="com.canli.oya.traininventory.utils.DataBindingUtils" />
+        <import type="com.canli.oya.traininventoryfirebase.utils.DataBindingUtils" />
     </data>
 
     <ScrollView

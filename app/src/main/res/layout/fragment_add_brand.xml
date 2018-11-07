@@ -5,12 +5,12 @@
     <data>
         <variable
             name="chosenBrand"
-            type="com.canli.oya.traininventory.data.entities.BrandEntry" />
+            type="com.canli.oya.traininventoryfirebase.data.model.Brand" />
         <variable
             name="isEdit"
             type="boolean" />
 
-        <import type="com.canli.oya.traininventory.ui.AddBrandFragment" />
+        <import type="com.canli.oya.traininventoryfirebase.ui.AddBrandFragment" />
 
     </data>
 
