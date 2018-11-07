@@ -1,5 +1,6 @@
 package com.canli.oya.traininventoryfirebase.ui;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -23,11 +24,9 @@ import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.adapters.CategoryAdapter;
-import com.canli.oya.traininventoryfirebase.data.model.Category;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentBrandlistBinding;
 import com.canli.oya.traininventoryfirebase.utils.AppExecutors;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
-import com.canli.oya.traininventoryfirebase.utils.InjectorUtils;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 
 import java.util.List;
@@ -65,16 +64,7 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
         super.onActivityCreated(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        mViewModel.loadCategoryList(InjectorUtils.provideCategoryRepo());
-        mCategories = mViewModel.getCategoryList();
-        if (mCategories == null || mCategories.isEmpty()) {
-            binding.included.setIsEmpty(true);
-            binding.included.setEmptyMessage(getString(R.string.no_categories_found));
-        } else {
-            mAdapter.setCategories(mCategories);
-            binding.included.setIsEmpty(false);
-        }
-        /*mViewModel.getCategoryList().observe(CategoryListFragment.this, new Observer<List<String>>() {
+        mViewModel.getCategoryList().observe(CategoryListFragment.this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> categoryEntries) {
                 if (categoryEntries == null || categoryEntries.isEmpty()) {
@@ -86,7 +76,7 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
                     binding.included.setIsEmpty(false);
                 }
             }
-        });*/
+        });
 
         getActivity().setTitle(getString(R.string.all_categories));
 
@@ -103,14 +93,14 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
                 final int position = viewHolder.getAdapterPosition();
 
                 //First take a backup of the category to erase
-                final Category categoryToErase = new Category(mCategories.get(position));
+                final String categoryToErase = mCategories.get(position);
 
                 //Remove the category from the database
                 AppExecutors.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
                         //First check whether this category is used by trains table
-                        if (mViewModel.isThisCategoryUsed(categoryToErase.getCategoryName())) {
+                        if (mViewModel.isThisCategoryUsed(categoryToErase)) {
                             // If it is used, show a warning and don't let user delete this
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override

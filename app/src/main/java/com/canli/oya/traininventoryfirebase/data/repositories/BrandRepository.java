@@ -1,14 +1,14 @@
 package com.canli.oya.traininventoryfirebase.data.repositories;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.arch.core.util.Function;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.data.model.Brand;
+import com.canli.oya.traininventoryfirebase.utils.FirebaseQueryLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +16,13 @@ import java.util.List;
 public class BrandRepository {
 
     private static BrandRepository sInstance;
-    private List<Brand> brandList;
     private static final String TAG = "BrandRepository";
+    private final LiveData<List<Brand>> brandList;
 
     private BrandRepository() {
-        loadBrands();
+        Log.d(TAG, "new instance of BrandRepository");
+        FirebaseQueryLiveData brandSnapshot = new FirebaseQueryLiveData(FirebaseUtils.getBrandsRef());
+        brandList = Transformations.map(brandSnapshot, new Deserializer());
     }
 
     public static BrandRepository getInstance(){
@@ -32,31 +34,18 @@ public class BrandRepository {
         return sInstance;
     }
 
-    private void loadBrands(){
-        Log.d(TAG, "loading brands");
-        brandList = new ArrayList<>();
-        FirebaseUtils.getBrandsRef().addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                brandList.add(dataSnapshot.getValue(Brand.class));
-                Log.d(TAG, "brand list size: " + brandList.size());
+    private class Deserializer implements Function<DataSnapshot, List<Brand>> {
+        @Override
+        public List<Brand> apply(DataSnapshot dataSnapshot) {
+            List<Brand> categories = new ArrayList<>();
+            for(DataSnapshot data : dataSnapshot.getChildren()){
+                categories.add(data.getValue(Brand.class));
             }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        });
+            return categories;
+        }
     }
 
-    public List<Brand> getBrandList() {
+    public LiveData<List<Brand>> getBrandList() {
         return brandList;
     }
 

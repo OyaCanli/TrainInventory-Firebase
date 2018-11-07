@@ -1,14 +1,16 @@
 package com.canli.oya.traininventoryfirebase.data.repositories;
 
+import android.arch.core.util.Function;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.data.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.data.model.Train;
+import com.canli.oya.traininventoryfirebase.utils.FirebaseQueryLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.canli.oya.traininventoryfirebase.utils.UploadTrainAsyncTask;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -21,9 +23,12 @@ public class TrainRepository {
     private static TrainRepository sInstance;
     private List<MinimalTrain> trainList;
     private static final String TAG = "TrainRepository";
+    private final LiveData<List<MinimalTrain>> minimalTrains;
 
     private TrainRepository() {
-        loadTrains();
+        Log.d(TAG, "new instance of TrainRepository");
+        FirebaseQueryLiveData allTrains = new FirebaseQueryLiveData(FirebaseUtils.getMinimalTrainsRef());
+        minimalTrains = Transformations.map(allTrains, new Deserializer());
     }
 
     public static TrainRepository getInstance() {
@@ -35,33 +40,19 @@ public class TrainRepository {
         return sInstance;
     }
 
-    private void loadTrains() {
-        Log.d(TAG, "loading trains");
-        trainList = new ArrayList<>();
-        FirebaseUtils.getMinimalTrainsRef().addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                trainList.add(dataSnapshot.getValue(MinimalTrain.class));
-                Log.d(TAG, "train list size: " + trainList.size());
+    private class Deserializer implements Function<DataSnapshot, List<MinimalTrain>> {
+        @Override
+        public List<MinimalTrain> apply(DataSnapshot dataSnapshot) {
+            List<MinimalTrain> minimalTrains = new ArrayList<>();
+            for(DataSnapshot data : dataSnapshot.getChildren()){
+                minimalTrains.add(data.getValue(MinimalTrain.class));
             }
+            return minimalTrains;
+        }
+    }
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-
+    public LiveData<List<MinimalTrain>> getMinimalTrains() {
+        return minimalTrains;
     }
 
     public List<MinimalTrain> getTrainList() {
@@ -129,7 +120,7 @@ public class TrainRepository {
         });
     }
 
-    public List<Train> searchInTrains(String query) {
+    public List<MinimalTrain> searchInTrains(String query) {
         return null;
     }
 

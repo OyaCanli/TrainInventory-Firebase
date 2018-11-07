@@ -1,5 +1,6 @@
 package com.canli.oya.traininventoryfirebase.ui;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -19,11 +20,10 @@ import android.view.ViewGroup;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.adapters.TrainAdapter;
-import com.canli.oya.traininventoryfirebase.data.model.Train;
+import com.canli.oya.traininventoryfirebase.data.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentListBinding;
 import com.canli.oya.traininventoryfirebase.utils.AppExecutors;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
-import com.canli.oya.traininventoryfirebase.utils.InjectorUtils;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 
 import java.util.List;
@@ -31,8 +31,8 @@ import java.util.List;
 public class TrainListFragment extends Fragment implements TrainAdapter.TrainItemClickListener {
 
     private TrainAdapter mAdapter;
-    private List<Train> mTrainList;
-    private List<Train> filteredTrains;
+    private List<MinimalTrain> mTrainList;
+    private List<MinimalTrain> filteredTrains;
     private FragmentListBinding binding;
     private MainViewModel mViewModel;
 
@@ -61,7 +61,6 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
         super.onActivityCreated(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        mViewModel.loadTrainList(InjectorUtils.provideTrainRepo());
 
         Bundle bundle = getArguments();
         //If the list will be used for showing selected trains
@@ -107,9 +106,9 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 default: {
                     //If the list is going to be use for showing all trains, which is the default behaviour
                     getActivity().setTitle(getString(R.string.all_trains));
-                    /*mViewModel.getTrainList().observe(TrainListFragment.this, new Observer<List<Train>>() {
+                    mViewModel.getTrainList().observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
                         @Override
-                        public void onChanged(@Nullable List<Train> trainEntries) {
+                        public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries == null || trainEntries.isEmpty()) {
                                 binding.setIsEmpty(true);
                                 binding.setEmptyMessage(getString(R.string.no_trains_found));
@@ -119,7 +118,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                                 mTrainList = trainEntries;
                             }
                         }
-                    });*/
+                    });
                 }
             }
         }

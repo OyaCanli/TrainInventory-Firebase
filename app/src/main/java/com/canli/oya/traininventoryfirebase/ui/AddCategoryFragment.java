@@ -16,7 +16,6 @@ import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
 
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.data.model.Category;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentAddCategoryBinding;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 
@@ -54,9 +53,9 @@ public class AddCategoryFragment extends Fragment {
 
     private void saveCategory() {
         String categoryName = binding.addCategoryEditCatName.getText().toString().trim();
-        final Category newCategory = new Category(categoryName);
         //Insert the category by the intermediance of view model
-        mViewModel.insertCategory(newCategory);
+
+        mViewModel.insertCategory(categoryName);
 
         //Remove the fragment
         Fragment parentFrag = getParentFragment();

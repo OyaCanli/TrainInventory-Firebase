@@ -1,14 +1,13 @@
 package com.canli.oya.traininventoryfirebase.data.repositories;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.arch.core.util.Function;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.util.Log;
 
-import com.canli.oya.traininventoryfirebase.data.model.Category;
+import com.canli.oya.traininventoryfirebase.utils.FirebaseQueryLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +15,13 @@ import java.util.List;
 public class CategoryRepository {
 
     private static CategoryRepository sInstance;
-    private List<String> categoryList;
     private static final String TAG = "CategoryRepository";
+    private final LiveData<List<String>> categoryList;
 
     private CategoryRepository() {
-        loadCategories();
+        Log.d(TAG, "new instance of CategoryRepository");
+        FirebaseQueryLiveData categorySnapshot = new FirebaseQueryLiveData(FirebaseUtils.getCategoriesRef());
+        categoryList = Transformations.map(categorySnapshot, new Deserializer());
     }
 
     public static CategoryRepository getInstance() {
@@ -32,39 +33,26 @@ public class CategoryRepository {
         return sInstance;
     }
 
-    private void loadCategories() {
-        Log.d(TAG, "loading categories");
-        categoryList = new ArrayList<>();
-        FirebaseUtils.getCategoriesRef().addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                categoryList.add(dataSnapshot.getValue(Category.class).getCategoryName());
-                Log.d(TAG, "category list size: " + categoryList.size());
+    private class Deserializer implements Function<DataSnapshot, List<String>> {
+        @Override
+        public List<String> apply(DataSnapshot dataSnapshot) {
+            List<String> categories = new ArrayList<>();
+            for(DataSnapshot data : dataSnapshot.getChildren()){
+                categories.add(data.getValue(String.class));
             }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        });
+            return categories;
+        }
     }
 
-    public List<String> getCategoryList() {
+    public LiveData<List<String>> getCategoryList() {
         return categoryList;
     }
 
-    public void insertCategory(final Category category) {
-        FirebaseUtils.getCategoriesRef().child(category.getCategoryName()).setValue(category);
+    public void insertCategory(final String category) {
+        FirebaseUtils.getCategoriesRef().child(category).setValue(category);
     }
 
-    public void deleteCategory(final Category category) {
+    public void deleteCategory(final String category) {
 
     }
 

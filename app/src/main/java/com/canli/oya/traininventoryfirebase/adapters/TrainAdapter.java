@@ -7,14 +7,14 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.data.model.Train;
+import com.canli.oya.traininventoryfirebase.data.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.databinding.TrainItemBinding;
 
 import java.util.List;
 
 public class TrainAdapter extends RecyclerView.Adapter<TrainAdapter.TrainViewHolder>{
 
-    private List<Train> mTrainList;
+    private List<MinimalTrain> mTrainList;
     private final TrainItemClickListener mClickListener;
 
     public TrainAdapter(TrainItemClickListener listener) {
@@ -33,7 +33,7 @@ public class TrainAdapter extends RecyclerView.Adapter<TrainAdapter.TrainViewHol
 
     @Override
     public void onBindViewHolder(@NonNull TrainViewHolder holder, int position) {
-        Train currentTrain = mTrainList.get(position);
+        MinimalTrain currentTrain = mTrainList.get(position);
         holder.binding.setTrain(currentTrain);
         holder.binding.executePendingBindings();
     }
@@ -43,7 +43,7 @@ public class TrainAdapter extends RecyclerView.Adapter<TrainAdapter.TrainViewHol
         return mTrainList == null ? 0 : mTrainList.size();
     }
 
-    public void setTrains(List<Train> newList){
+    public void setTrains(List<MinimalTrain> newList){
         mTrainList = newList;
         notifyDataSetChanged();
     }

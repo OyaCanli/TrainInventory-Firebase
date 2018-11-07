@@ -5,35 +5,31 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.canli.oya.traininventoryfirebase.data.model.Brand;
-import com.canli.oya.traininventoryfirebase.data.model.Category;
+import com.canli.oya.traininventoryfirebase.data.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.data.model.Train;
 import com.canli.oya.traininventoryfirebase.data.repositories.BrandRepository;
 import com.canli.oya.traininventoryfirebase.data.repositories.CategoryRepository;
 import com.canli.oya.traininventoryfirebase.data.repositories.TrainRepository;
-import com.canli.oya.traininventoryfirebase.data.model.MinimalTrain;
 
 import java.util.List;
 
 public class MainViewModel extends ViewModel {
 
-    private List<MinimalTrain> mTrainList;
-    private List<Brand> mBrandList;
-    private List<String> mCategoryList;
     private TrainRepository mTrainRepo;
     private BrandRepository mBrandRepo;
     private CategoryRepository mCategoryRepo;
     private final MutableLiveData<Brand> mChosenBrand = new MutableLiveData<>();
 
-    /////////// TRAIN LIST /////////////
-    public void loadTrainList(TrainRepository trainRepo){
-        if(mTrainList == null){
-            mTrainList = trainRepo.getTrainList();
-        }
-        mTrainRepo = trainRepo;
+    public MainViewModel() {
+        mCategoryRepo = CategoryRepository.getInstance();
+        mBrandRepo = BrandRepository.getInstance();
+        mTrainRepo = TrainRepository.getInstance(); //TODO: Consider changing this, because no need to load all trains in startup
     }
 
-    public List<MinimalTrain> getTrainList() {
-        return mTrainList;
+    /////////// TRAIN LIST /////////////
+
+    public LiveData<List<MinimalTrain>> getTrainList() {
+        return mTrainRepo.getMinimalTrains();
     }
 
     public void insertTrain(Train train){
@@ -50,15 +46,8 @@ public class MainViewModel extends ViewModel {
 
     ////////////// BRAND LIST //////////////////
 
-    public void loadBrandList(BrandRepository brandRepo){
-        if(mBrandList == null){
-            mBrandList = brandRepo.getBrandList();
-        }
-        mBrandRepo = brandRepo;
-    }
-
-    public List<Brand> getBrandList() {
-        return mBrandList;
+    public LiveData<List<Brand>> getBrandList() {
+        return mBrandRepo.getBrandList();
     }
 
     public LiveData<Brand> getChosenBrand() {
@@ -87,22 +76,15 @@ public class MainViewModel extends ViewModel {
 
     //////////////// CATEGORY LIST //////////////////
 
-    public void loadCategoryList(CategoryRepository categoryRepo){
-        if(mCategoryList == null){
-            mCategoryList = categoryRepo.getCategoryList();
-        }
-        mCategoryRepo = categoryRepo;
+    public LiveData<List<String>> getCategoryList() {
+        return mCategoryRepo.getCategoryList();
     }
 
-    public List<String> getCategoryList() {
-        return mCategoryList;
-    }
-
-    public void deleteCategory(Category category){
+    public void deleteCategory(String category){
         mCategoryRepo.deleteCategory(category);
     }
 
-    public void insertCategory(Category category){
+    public void insertCategory(String category){
         mCategoryRepo.insertCategory(category);
     }
 
@@ -119,7 +101,7 @@ public class MainViewModel extends ViewModel {
         return mTrainRepo.getTrainsFromThisCategory(category);
     }*/
 
-    public List<Train> searchInTrains(String query){
+    public List<MinimalTrain> searchInTrains(String query){
         return mTrainRepo.searchInTrains(query);
     }
 }

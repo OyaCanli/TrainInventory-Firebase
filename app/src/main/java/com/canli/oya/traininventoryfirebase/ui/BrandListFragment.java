@@ -1,5 +1,6 @@
 package com.canli.oya.traininventoryfirebase.ui;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -67,16 +68,7 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
         super.onActivityCreated(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        mViewModel.loadBrandList(InjectorUtils.provideBrandRepo());
-        brands = mViewModel.getBrandList();
-        if (brands == null || brands.isEmpty()) {
-            binding.included.setIsEmpty(true);
-            binding.included.setEmptyMessage(getString(R.string.no_brands_found));
-        } else {
-            adapter.setBrands(brands);
-            binding.included.setIsEmpty(false);
-        }
-        /*mViewModel.getBrandList().observe(BrandListFragment.this, new Observer<List<Brand>>() {
+        mViewModel.getBrandList().observe(BrandListFragment.this, new Observer<List<Brand>>() {
             @Override
             public void onChanged(@Nullable List<Brand> brandEntries) {
                 if (brandEntries == null || brandEntries.isEmpty()) {
@@ -88,7 +80,7 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
                     binding.included.setIsEmpty(false);
                 }
             }
-        });*/
+        });
         getActivity().setTitle(getString(R.string.all_brands));
 
         final CoordinatorLayout coordinator = getActivity().findViewById(R.id.coordinator);

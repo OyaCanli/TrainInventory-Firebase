@@ -1,6 +1,7 @@
 package com.canli.oya.traininventoryfirebase.ui;
 
 import android.Manifest;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,7 +39,6 @@ import com.canli.oya.traininventoryfirebase.databinding.FragmentAddTrainBinding;
 import com.canli.oya.traininventoryfirebase.utils.BitmapUtils;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.utils.GlideApp;
-import com.canli.oya.traininventoryfirebase.utils.InjectorUtils;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 
 import java.io.File;
@@ -128,22 +128,20 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         super.onActivityCreated(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        mViewModel.loadBrandList(InjectorUtils.provideBrandRepo());
-        mViewModel.loadCategoryList(InjectorUtils.provideCategoryRepo());
 
         //Set brand spinner
         brandList = new ArrayList<>();
         final CustomSpinAdapter brandAdapter = new CustomSpinAdapter(getActivity(), brandList);
         binding.brandSpinner.setAdapter(brandAdapter);
         binding.brandSpinner.setOnItemSelectedListener(this);
-        /*mViewModel.getBrandList().observe(AddTrainFragment.this, new Observer<List<Brand>>() {
+        mViewModel.getBrandList().observe(AddTrainFragment.this, new Observer<List<Brand>>() {
             @Override
             public void onChanged(@Nullable List<Brand> brandEntries) {
                 brandList.clear();
                 brandList.addAll(brandEntries);
                 brandAdapter.notifyDataSetChanged();
             }
-        });*/
+        });
 
         //Set category spinner
         categoryList = new ArrayList<>();
@@ -151,14 +149,14 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.categorySpinner.setAdapter(categoryAdapter);
         binding.categorySpinner.setOnItemSelectedListener(this);
-        /*mViewModel.getCategoryList().observe(AddTrainFragment.this, new Observer<List<String>>() {
+        mViewModel.getCategoryList().observe(AddTrainFragment.this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> categoryEntries) {
                 categoryList.clear();
                 categoryList.addAll(categoryEntries);
                 categoryAdapter.notifyDataSetChanged();
             }
-        });*/
+        });
 
         Bundle bundle = getArguments();
         //"Edit" case
