@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.data.model.Train;
+import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentTrainDetailsBinding;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.utils.InjectorUtils;

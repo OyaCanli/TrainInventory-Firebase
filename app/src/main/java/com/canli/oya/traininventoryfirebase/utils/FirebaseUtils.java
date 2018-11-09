@@ -1,7 +1,7 @@
 package com.canli.oya.traininventoryfirebase.utils;
 
-import com.canli.oya.traininventoryfirebase.data.model.MinimalTrain;
-import com.canli.oya.traininventoryfirebase.data.model.Train;
+import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
+import com.canli.oya.traininventoryfirebase.model.Train;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -63,10 +63,18 @@ public class FirebaseUtils {
         return "trainsInBrands/" + brandName+ "/" + trainKey;
     }
 
-    public static StorageReference getUserPhotosRef() {
+    public static StorageReference getTrainPhotosRef() {
         String uid = getCurrentUserId();
         if (uid != null) {
             return FirebaseStorage.getInstance().getReference().child(getCurrentUserId()).child("train_photos" );
+        }
+        return null;
+    }
+
+    public static StorageReference getBrandPhotosRef() {
+        String uid = getCurrentUserId();
+        if (uid != null) {
+            return FirebaseStorage.getInstance().getReference().child(getCurrentUserId()).child("brands" );
         }
         return null;
     }

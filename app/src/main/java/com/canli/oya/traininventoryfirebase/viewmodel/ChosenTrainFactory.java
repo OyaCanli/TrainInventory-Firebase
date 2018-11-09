@@ -4,7 +4,7 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import com.canli.oya.traininventoryfirebase.data.repositories.TrainRepository;
+import com.canli.oya.traininventoryfirebase.repositories.TrainRepository;
 
 public class ChosenTrainFactory extends ViewModelProvider.NewInstanceFactory {
 

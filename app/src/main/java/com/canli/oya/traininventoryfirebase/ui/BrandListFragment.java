@@ -27,11 +27,10 @@ import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.adapters.BrandAdapter;
-import com.canli.oya.traininventoryfirebase.data.model.Brand;
+import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentBrandlistBinding;
 import com.canli.oya.traininventoryfirebase.utils.AppExecutors;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
-import com.canli.oya.traininventoryfirebase.utils.InjectorUtils;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 
 import java.util.List;

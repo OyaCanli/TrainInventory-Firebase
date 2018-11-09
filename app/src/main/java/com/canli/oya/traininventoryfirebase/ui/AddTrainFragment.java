@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,6 +21,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,12 +35,13 @@ import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.adapters.CustomSpinAdapter;
-import com.canli.oya.traininventoryfirebase.data.model.Brand;
-import com.canli.oya.traininventoryfirebase.data.model.Train;
+import com.canli.oya.traininventoryfirebase.model.Brand;
+import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentAddTrainBinding;
 import com.canli.oya.traininventoryfirebase.utils.BitmapUtils;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.utils.GlideApp;
+import com.canli.oya.traininventoryfirebase.utils.UploadImageAsyncTask;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 
 import java.io.File;
@@ -49,8 +52,9 @@ import java.util.List;
 import static android.app.Activity.RESULT_OK;
 
 public class AddTrainFragment extends Fragment implements View.OnClickListener,
-        AdapterView.OnItemSelectedListener {
+        AdapterView.OnItemSelectedListener, UploadImageAsyncTask.ImageUploadListener {
 
+    private static final String TAG = "AddTrainFragment";
     private FragmentAddTrainBinding binding;
     private String mChosenCategory;
     private String mChosenBrand;
@@ -61,9 +65,9 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     private List<String> categoryList;
     private List<Brand> brandList;
     private int mTrainId;
-    private UnsavedChangesListener mCallback;
+    private UnsavedChangesListener mUnsavedChangesCallback;
     private MainViewModel mViewModel;
-    private Train mChosenTrain;
+    private Train mTrainToUpdate;
     private boolean isEdit;
     private TextWatcher mTextWatcher = new TextWatcher() {
         @Override
@@ -76,7 +80,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
 
         @Override
         public void afterTextChanged(Editable s) {
-            mCallback.warnForUnsavedChanges(true);
+            mUnsavedChangesCallback.warnForUnsavedChanges(true);
         }
     };
 
@@ -87,6 +91,13 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     };
 
     public AddTrainFragment() {
+    }
+
+    @Override
+    public void onImageUploaded(Uri imageUri) {
+        Log.d(TAG, "onImageUploaded called");
+        mTrainToUpdate.setImageUri(imageUri.toString());
+        saveTrainToDatabase(mTrainToUpdate);
     }
 
     public interface UnsavedChangesListener {
@@ -100,7 +111,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
         try {
-            mCallback = (UnsavedChangesListener) context;
+            mUnsavedChangesCallback = (UnsavedChangesListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement UnsavedChangesListener");
@@ -236,7 +247,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         binding.editScale.setText(savedInstanceState.getString(Constants.SCALE_ET));
     }
 
-    private void setCategorySpinner() {
+   /* private void setCategorySpinner() {
         binding.categorySpinner.setSelection(categoryList.indexOf(mChosenTrain.getCategoryName()));
     }
 
@@ -248,7 +259,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
             }
         }
         binding.brandSpinner.setSelection(brandIndex);
-    }
+    }*/
 
     @Override
     public void onClick(View v) {
@@ -279,7 +290,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         int id = item.getItemId();
         if (id == R.id.action_save) {
             saveTrain();
-        } else if(id == android.R.id.home){
+        } else if (id == android.R.id.home) {
             getActivity().onBackPressed();
         }
         return super.onOptionsItemSelected(item);
@@ -302,6 +313,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     }
 
     private void saveTrain() {
+        //Verify data
         String quantityToParse = binding.editQuantity.getText().toString().trim();
         //Quantity can be null. But if it is not null it should be a positive integer
         int quantity = 0;
@@ -324,17 +336,19 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
                 binding.editLocationLetter.getText().toString().trim();
         String scale = binding.editScale.getText().toString().trim();
 
-        if (mTrainId == 0) {
-            //If this is a new train
-            final Train newTrain = new Train(trainName, reference, mChosenBrand, mChosenCategory, quantity, mImageUri, description, location, scale);
-            mViewModel.insertTrain(newTrain);
-        } else {
-            //If this is a train that already exist
-            final Train trainToUpdate = new Train(trainName, reference, mChosenBrand, mChosenCategory, quantity, mImageUri, description, location, scale);
-            mViewModel.updateTrain(trainToUpdate);
+        mTrainToUpdate = new Train(trainName, reference, mChosenBrand, mChosenCategory, quantity, mImageUri, description, location, scale);
+
+        if (!TextUtils.isEmpty(mImageUri)) {
+            UploadImageAsyncTask uploadImageTask = new UploadImageAsyncTask(this, Uri.parse(mImageUri));
+            uploadImageTask.execute(getActivity());
         }
+    }
+
+    private void saveTrainToDatabase(Train trainToUpdate) {
+        mViewModel.insertTrain(trainToUpdate);
+
         //After adding the train, go back to where user come from.
-        mCallback.warnForUnsavedChanges(false);
+        mUnsavedChangesCallback.warnForUnsavedChanges(false);
         getActivity().onBackPressed();
     }
 
@@ -485,7 +499,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onDetach() {
         super.onDetach();
-        mCallback.warnForUnsavedChanges(false);
+        mUnsavedChangesCallback.warnForUnsavedChanges(false);
     }
 
     private void setChangeListenersToEdittexts() {
@@ -503,7 +517,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         View.OnTouchListener touchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                mCallback.warnForUnsavedChanges(true);
+                mUnsavedChangesCallback.warnForUnsavedChanges(true);
                 return false;
             }
         };

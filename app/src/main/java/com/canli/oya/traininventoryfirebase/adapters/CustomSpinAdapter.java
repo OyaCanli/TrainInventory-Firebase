@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.data.model.Brand;
+import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.utils.GlideApp;
 
 import java.util.List;

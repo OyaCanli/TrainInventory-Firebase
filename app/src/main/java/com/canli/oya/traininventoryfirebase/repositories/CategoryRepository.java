@@ -1,4 +1,4 @@
-package com.canli.oya.traininventoryfirebase.data.repositories;
+package com.canli.oya.traininventoryfirebase.repositories;
 
 import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;

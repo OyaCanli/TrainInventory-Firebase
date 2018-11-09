@@ -6,7 +6,7 @@
     <data>
         <variable
             name="chosenTrain"
-            type="com.canli.oya.traininventoryfirebase.data.model.Train" />
+            type="com.canli.oya.traininventoryfirebase.model.Train" />
 
         <variable
             name="isEdit"

@@ -1,4 +1,4 @@
-package com.canli.oya.traininventoryfirebase.data.model;
+package com.canli.oya.traininventoryfirebase.model;
 
 import com.google.firebase.database.Exclude;
 

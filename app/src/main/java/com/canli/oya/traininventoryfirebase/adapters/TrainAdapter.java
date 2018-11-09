@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.data.model.MinimalTrain;
+import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.databinding.TrainItemBinding;
 
 import java.util.List;

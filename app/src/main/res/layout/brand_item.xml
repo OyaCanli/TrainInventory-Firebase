@@ -5,7 +5,7 @@
 
     <data>
         <variable name="brand"
-            type="com.canli.oya.traininventoryfirebase.data.model.Brand"/>
+            type="com.canli.oya.traininventoryfirebase.model.Brand"/>
 
         <variable
             name="brandItemClick"

@@ -1,11 +1,11 @@
-package com.canli.oya.traininventoryfirebase.data.repositories;
+package com.canli.oya.traininventoryfirebase.repositories;
 
 import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.util.Log;
 
-import com.canli.oya.traininventoryfirebase.data.model.Brand;
+import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseQueryLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.google.firebase.database.DataSnapshot;

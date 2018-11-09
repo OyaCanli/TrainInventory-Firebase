@@ -1,4 +1,4 @@
-package com.canli.oya.traininventoryfirebase.data.repositories;
+package com.canli.oya.traininventoryfirebase.repositories;
 
 import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
@@ -6,17 +6,20 @@ import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.canli.oya.traininventoryfirebase.data.model.MinimalTrain;
-import com.canli.oya.traininventoryfirebase.data.model.Train;
+import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
+import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseQueryLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
-import com.canli.oya.traininventoryfirebase.utils.UploadTrainAsyncTask;
+import com.canli.oya.traininventoryfirebase.utils.UploadImageAsyncTask;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TrainRepository {
 
@@ -64,13 +67,21 @@ public class TrainRepository {
     }
 
     public void insertTrain(Train train) {
-        UploadTrainAsyncTask uploadTask = new UploadTrainAsyncTask();
-        uploadTask.execute(train);
+        //Push the full train object
+        DatabaseReference TRAINS_REF = FirebaseUtils.getFullTrainsRef();
+        String trainKey = TRAINS_REF.push().getKey();
+        TRAINS_REF.child(trainKey).setValue(train);
+        //Push the minimal train object in multiple locations
+        MinimalTrain minimalTrain = FirebaseUtils.getMinimalVersion(train);
+        Map<String, Object> trainValues = minimalTrain.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(FirebaseUtils.getMinimalTrainsPath(trainKey), trainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInCategoriesPath(minimalTrain.getCategoryName(), trainKey), trainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(minimalTrain.getBrandName(), trainKey), trainValues);
+        FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
     }
 
     public void updateTrain(Train train) {
-        UploadTrainAsyncTask uploadTask = new UploadTrainAsyncTask();
-        uploadTask.execute(train);
         //TODO: consider doing something different here
     }
 

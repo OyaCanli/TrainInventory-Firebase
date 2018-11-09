@@ -2,8 +2,8 @@ package com.canli.oya.traininventoryfirebase.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.canli.oya.traininventoryfirebase.data.model.Train;
-import com.canli.oya.traininventoryfirebase.data.repositories.TrainRepository;
+import com.canli.oya.traininventoryfirebase.model.Train;
+import com.canli.oya.traininventoryfirebase.repositories.TrainRepository;
 
 public class ChosenTrainViewModel extends ViewModel {
     private final Train chosenTrain;

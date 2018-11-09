@@ -4,12 +4,12 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.canli.oya.traininventoryfirebase.data.model.Brand;
-import com.canli.oya.traininventoryfirebase.data.model.MinimalTrain;
-import com.canli.oya.traininventoryfirebase.data.model.Train;
-import com.canli.oya.traininventoryfirebase.data.repositories.BrandRepository;
-import com.canli.oya.traininventoryfirebase.data.repositories.CategoryRepository;
-import com.canli.oya.traininventoryfirebase.data.repositories.TrainRepository;
+import com.canli.oya.traininventoryfirebase.model.Brand;
+import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
+import com.canli.oya.traininventoryfirebase.model.Train;
+import com.canli.oya.traininventoryfirebase.repositories.BrandRepository;
+import com.canli.oya.traininventoryfirebase.repositories.CategoryRepository;
+import com.canli.oya.traininventoryfirebase.repositories.TrainRepository;
 
 import java.util.List;
 

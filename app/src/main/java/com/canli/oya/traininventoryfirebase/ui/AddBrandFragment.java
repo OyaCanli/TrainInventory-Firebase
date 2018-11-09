@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.data.model.Brand;
+import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentAddBrandBinding;
 import com.canli.oya.traininventoryfirebase.utils.BitmapUtils;
 import com.canli.oya.traininventoryfirebase.utils.Constants;

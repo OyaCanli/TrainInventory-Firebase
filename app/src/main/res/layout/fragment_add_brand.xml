@@ -5,7 +5,7 @@
     <data>
         <variable
             name="chosenBrand"
-            type="com.canli.oya.traininventoryfirebase.data.model.Brand" />
+            type="com.canli.oya.traininventoryfirebase.model.Brand" />
         <variable
             name="isEdit"
             type="boolean" />

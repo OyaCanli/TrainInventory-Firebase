@@ -6,7 +6,7 @@
     <data>
         <variable
             name="train"
-            type="com.canli.oya.traininventoryfirebase.data.model.MinimalTrain"/>
+            type="com.canli.oya.traininventoryfirebase.model.MinimalTrain"/>
 
         <variable
             name="trainItemClick"
