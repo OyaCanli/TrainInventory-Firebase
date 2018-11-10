@@ -10,7 +10,6 @@ import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseQueryLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
-import com.canli.oya.traininventoryfirebase.utils.UploadImageAsyncTask;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +26,7 @@ public class TrainRepository {
     private List<MinimalTrain> trainList;
     private static final String TAG = "TrainRepository";
     private final LiveData<List<MinimalTrain>> minimalTrains;
+    private String trainPushId;
 
     private TrainRepository() {
         Log.d(TAG, "new instance of TrainRepository");
@@ -47,7 +47,7 @@ public class TrainRepository {
         @Override
         public List<MinimalTrain> apply(DataSnapshot dataSnapshot) {
             List<MinimalTrain> minimalTrains = new ArrayList<>();
-            for(DataSnapshot data : dataSnapshot.getChildren()){
+            for (DataSnapshot data : dataSnapshot.getChildren()) {
                 minimalTrains.add(data.getValue(MinimalTrain.class));
             }
             return minimalTrains;
@@ -70,7 +70,10 @@ public class TrainRepository {
         //Push the full train object
         DatabaseReference TRAINS_REF = FirebaseUtils.getFullTrainsRef();
         String trainKey = TRAINS_REF.push().getKey();
+        train.setTrainId(trainKey);
+        trainPushId = trainKey;
         TRAINS_REF.child(trainKey).setValue(train);
+
         //Push the minimal train object in multiple locations
         MinimalTrain minimalTrain = FirebaseUtils.getMinimalVersion(train);
         Map<String, Object> trainValues = minimalTrain.toMap();
@@ -81,8 +84,14 @@ public class TrainRepository {
         FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
     }
 
-    public void updateTrain(Train train) {
-        //TODO: consider doing something different here
+    public void updateTrainImageUrl(Train trainToUpdate) {
+        //Update the uri of the corresponding train object
+        FirebaseUtils.getFullTrainsRef().child(trainPushId).child("imageUri").setValue(trainToUpdate.getImageUri());
+
+        //Update the image url of the corresponding minimal train objects
+        FirebaseUtils.getMinimalTrainsRef().child(trainPushId).child("imageUri").setValue(trainToUpdate.getImageUri());
+        FirebaseUtils.getTrainsInBrandsRef().child(trainToUpdate.getBrandName()).child(trainPushId).child("imageUri").setValue(trainToUpdate.getImageUri());
+        FirebaseUtils.getTrainsInCategoriesRef().child(trainToUpdate.getCategoryName()).child(trainPushId).child("imageUri").setValue(trainToUpdate.getImageUri());
     }
 
     public void deleteTrain(Train train) {
@@ -135,4 +144,8 @@ public class TrainRepository {
         return null;
     }
 
+
+    public String getTrainPushId() {
+        return trainPushId;
+    }
 }

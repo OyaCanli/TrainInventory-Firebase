@@ -8,6 +8,7 @@ import java.util.Map;
 
 public class MinimalTrain implements Serializable {
 
+    private String trainId;
     private String trainName;
     private String modelReference;
     private String brandName;
@@ -17,12 +18,17 @@ public class MinimalTrain implements Serializable {
     public MinimalTrain() {
     }
 
-    public MinimalTrain(String trainName, String modelReference, String brandName, String categoryName, String imageUri) {
+    public MinimalTrain(String trainId, String trainName, String modelReference, String brandName, String categoryName, String imageUri) {
+        this.trainId = trainId;
         this.trainName = trainName;
         this.modelReference = modelReference;
         this.brandName = brandName;
         this.categoryName = categoryName;
         this.imageUri = imageUri;
+    }
+
+    public String getTrainId() {
+        return trainId;
     }
 
     public String getTrainName() {
@@ -43,6 +49,10 @@ public class MinimalTrain implements Serializable {
 
     public String getImageUri() {
         return imageUri;
+    }
+
+    public void setTrainId(String trainId) {
+        this.trainId = trainId;
     }
 
     public void setTrainName(String trainName) {
@@ -68,6 +78,7 @@ public class MinimalTrain implements Serializable {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
+        result.put("trainId", trainId);
         result.put("trainName", trainName);
         result.put("modelReference", modelReference);
         result.put("brandName", brandName);

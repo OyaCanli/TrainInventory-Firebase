@@ -80,6 +80,10 @@ public class FirebaseUtils {
     }
 
     public static MinimalTrain getMinimalVersion(Train train){
-        return new MinimalTrain(train.getTrainName(), train.getModelReference(), train.getBrandName(), train.getCategoryName(), train.getImageUri());
+        return new MinimalTrain(train.getTrainId(), train.getTrainName(), train.getModelReference(), train.getBrandName(), train.getCategoryName(), train.getImageUri());
     }
+
+
+
+
 }

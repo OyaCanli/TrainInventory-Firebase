@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -35,9 +34,9 @@ import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.adapters.CustomSpinAdapter;
+import com.canli.oya.traininventoryfirebase.databinding.FragmentAddTrainBinding;
 import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.model.Train;
-import com.canli.oya.traininventoryfirebase.databinding.FragmentAddTrainBinding;
 import com.canli.oya.traininventoryfirebase.utils.BitmapUtils;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.utils.GlideApp;
@@ -64,10 +63,10 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     private int mUsersChoice;
     private List<String> categoryList;
     private List<Brand> brandList;
+    private Train mTrainToUpdate;
     private int mTrainId;
     private UnsavedChangesListener mUnsavedChangesCallback;
     private MainViewModel mViewModel;
-    private Train mTrainToUpdate;
     private boolean isEdit;
     private TextWatcher mTextWatcher = new TextWatcher() {
         @Override
@@ -97,7 +96,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     public void onImageUploaded(Uri imageUri) {
         Log.d(TAG, "onImageUploaded called");
         mTrainToUpdate.setImageUri(imageUri.toString());
-        saveTrainToDatabase(mTrainToUpdate);
+        mViewModel.updateTrainImageUrl(mTrainToUpdate);
     }
 
     public interface UnsavedChangesListener {
@@ -336,16 +335,13 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
                 binding.editLocationLetter.getText().toString().trim();
         String scale = binding.editScale.getText().toString().trim();
 
-        mTrainToUpdate = new Train(trainName, reference, mChosenBrand, mChosenCategory, quantity, mImageUri, description, location, scale);
+        mTrainToUpdate = new Train(null, trainName, reference, mChosenBrand, mChosenCategory, quantity, null, description, location, scale);
 
         if (!TextUtils.isEmpty(mImageUri)) {
             UploadImageAsyncTask uploadImageTask = new UploadImageAsyncTask(this, Uri.parse(mImageUri));
             uploadImageTask.execute(getActivity());
         }
-    }
-
-    private void saveTrainToDatabase(Train trainToUpdate) {
-        mViewModel.insertTrain(trainToUpdate);
+        mViewModel.insertTrain(mTrainToUpdate);
 
         //After adding the train, go back to where user come from.
         mUnsavedChangesCallback.warnForUnsavedChanges(false);
