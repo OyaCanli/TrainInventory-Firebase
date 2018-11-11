@@ -28,6 +28,8 @@ import com.canli.oya.traininventoryfirebase.databinding.FragmentBrandlistBinding
 import com.canli.oya.traininventoryfirebase.utils.AppExecutors;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
@@ -37,9 +39,32 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     private List<String> mCategories;
     private FragmentBrandlistBinding binding;
     private MainViewModel mViewModel;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+        @Override
+        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user != null) {
+                setUpOnSignIn();
+            }
+        }
+    };
 
     public CategoryListFragment() {
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
     }
 
     @Nullable
@@ -63,6 +88,10 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        getActivity().setTitle(getString(R.string.all_categories));
+    }
+
+    private void setUpOnSignIn() {
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.getCategoryList().observe(CategoryListFragment.this, new Observer<List<String>>() {
             @Override
@@ -78,7 +107,6 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
             }
         });
 
-        getActivity().setTitle(getString(R.string.all_categories));
 
         //This part is for providing swipe-to-delete functionality, as well as a snack bar to undo deleting
         final CoordinatorLayout coordinator = getActivity().findViewById(R.id.coordinator);

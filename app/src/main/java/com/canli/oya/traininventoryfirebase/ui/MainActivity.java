@@ -231,9 +231,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 Log.d(TAG, "result ok");
                 // Sign-in succeeded, set up the UI
                 Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
-                onSignInInitialize();
-
-
             } else if (resultCode == RESULT_CANCELED) {
                 Log.d(TAG, "result cancelled");
                 // Sign in was canceled by the user, finish the activity
@@ -241,14 +238,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 finish();
             }
         }
-    }
-
-    private void onSignInInitialize() {
-        //Bring the category list fragment on sign in
-        fm.beginTransaction()
-                .setCustomAnimations(0, android.R.animator.fade_out)
-                .add(R.id.container, getCategoryListFragment())
-                .commit();
     }
 
     public TrainListFragment getTrainListFragment() {
