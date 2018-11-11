@@ -309,6 +309,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     }
 
     private void saveTrain() {
+        //TODO: do an alternative method for edit case
         //Verify data
         String quantityToParse = binding.editQuantity.getText().toString().trim();
         //Quantity can be null. But if it is not null it should be a positive integer

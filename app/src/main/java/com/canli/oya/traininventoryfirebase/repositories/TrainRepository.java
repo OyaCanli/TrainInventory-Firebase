@@ -23,7 +23,6 @@ import java.util.Map;
 public class TrainRepository {
 
     private static TrainRepository sInstance;
-    private List<MinimalTrain> trainList;
     private static final String TAG = "TrainRepository";
     private final LiveData<List<MinimalTrain>> minimalTrains;
     private String trainPushId;
@@ -103,54 +102,18 @@ public class TrainRepository {
 
     }
 
-    public void getTrainsFromThisBrand(String brandName) {
-        FirebaseUtils.getTrainsInBrandsRef().child(brandName).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (trainList != null) {
-                    trainList.clear();
-                } else {
-                    trainList = new ArrayList<>();
-                }
-                for (DataSnapshot train : dataSnapshot.getChildren()) {
-                    trainList.add(train.getValue(MinimalTrain.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+    public LiveData<List<MinimalTrain>> getTrainsFromThisBrand(String brandName) {
+        FirebaseQueryLiveData livedata = new FirebaseQueryLiveData(FirebaseUtils.getTrainsInBrandsRef().child(brandName));
+        return Transformations.map(livedata, new ListDeserializer());
     }
 
-    public void getTrainsFromThisCategory(String category) {
-        FirebaseUtils.getTrainsInCategoriesRef().child(category).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (trainList != null) {
-                    trainList.clear();
-                } else {
-                    trainList = new ArrayList<>();
-                }
-                for (DataSnapshot train : dataSnapshot.getChildren()) {
-                    trainList.add(train.getValue(MinimalTrain.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+    public LiveData<List<MinimalTrain>> getTrainsFromThisCategory(String category) {
+        FirebaseQueryLiveData livedata = new FirebaseQueryLiveData(FirebaseUtils.getTrainsInCategoriesRef().child(category));
+        return Transformations.map(livedata, new ListDeserializer());
     }
 
     public List<MinimalTrain> searchInTrains(String query) {
         return null;
     }
 
-
-    public String getTrainPushId() {
-        return trainPushId;
-    }
 }

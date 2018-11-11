@@ -70,9 +70,9 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 case Constants.TRAINS_OF_BRAND: {
                     String brandName = bundle.getString(Constants.BRAND_NAME);
                     getActivity().setTitle(getString(R.string.trains_of_the_brand, brandName));
-                    /*mViewModel.getTrainsFromThisBrand(brandName).observe(TrainListFragment.this, new Observer<List<Train>>() {
+                    mViewModel.getTrainsFromThisBrand(brandName).observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
                         @Override
-                        public void onChanged(@Nullable List<Train> trainEntries) {
+                        public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries == null || trainEntries.isEmpty()) {
                                 binding.setIsEmpty(true);
                                 binding.setEmptyMessage(getString(R.string.no_train_for_this_brand));
@@ -82,15 +82,15 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                                 mTrainList = trainEntries;
                             }
                         }
-                    });*/
+                    });
                     break;
                 }
                 case Constants.TRAINS_OF_CATEGORY:{
                     String categoryName = bundle.getString(Constants.CATEGORY_NAME);
                     getActivity().setTitle(getString(R.string.all_from_this_Category, categoryName));
-                    /*mViewModel.getTrainsFromThisCategory(categoryName).observe(TrainListFragment.this, new Observer<List<Train>>() {
+                    mViewModel.getTrainsFromThisCategory(categoryName).observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
                         @Override
-                        public void onChanged(@Nullable List<Train> trainEntries) {
+                        public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries == null || trainEntries.isEmpty()) {
                                 binding.setIsEmpty(true);
                                 binding.setEmptyMessage(getString(R.string.no_items_for_this_category));
@@ -100,7 +100,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                                 mTrainList = trainEntries;
                             }
                         }
-                    });*/
+                    });
                     break;
                 }
                 default: {

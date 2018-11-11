@@ -94,13 +94,13 @@ public class MainViewModel extends ViewModel {
     }
 
     ///////////// SEARCH //////////////////////////
-    /*public List<Train> getTrainsFromThisBrand(String brandName){
+    public LiveData<List<MinimalTrain>> getTrainsFromThisBrand(String brandName){
         return mTrainRepo.getTrainsFromThisBrand(brandName);
     }
 
-    public List<Train> getTrainsFromThisCategory(String category){
+    public LiveData<List<MinimalTrain>> getTrainsFromThisCategory(String category){
         return mTrainRepo.getTrainsFromThisCategory(category);
-    }*/
+    }
 
     public List<MinimalTrain> searchInTrains(String query){
         return mTrainRepo.searchInTrains(query);
