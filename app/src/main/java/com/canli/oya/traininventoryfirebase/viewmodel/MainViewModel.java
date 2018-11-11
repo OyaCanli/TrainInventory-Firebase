@@ -36,6 +36,10 @@ public class MainViewModel extends ViewModel {
         mTrainRepo.insertTrain(train);
     }
 
+    public void updateTrain(Train train){
+        mTrainRepo.updateTrain(train);
+    }
+
     public void updateTrainImageUrl(Train trainToUpdate){
         mTrainRepo.updateTrainImageUrl(trainToUpdate);
     }

@@ -72,6 +72,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     private MainViewModel mViewModel;
     private boolean isEdit;
     private boolean brandsLoaded, categoryLoaded, trainLoaded;
+    private boolean imageClicked;
     private TextWatcher mTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -134,6 +135,8 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         binding.addTrainAddBrandBtn.setOnClickListener(this);
         binding.addTrainAddCategoryBtn.setOnClickListener(this);
         binding.productDetailsGalleryImage.setOnClickListener(this);
+
+        imageClicked = false;
 
         return binding.getRoot();
     }
@@ -269,6 +272,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
                 break;
             }
             case R.id.product_details_gallery_image: {
+                imageClicked = true;
                 openImageDialog();
                 break;
             }
@@ -309,7 +313,6 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     }
 
     private void saveTrain() {
-        //TODO: do an alternative method for edit case
         //Verify data
         String quantityToParse = binding.editQuantity.getText().toString().trim();
         //Quantity can be null. But if it is not null it should be a positive integer
@@ -333,13 +336,18 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
                 binding.editLocationLetter.getText().toString().trim();
         String scale = binding.editScale.getText().toString().trim();
 
-        mTrainToUpdate = new Train(null, trainName, reference, mChosenBrand, mChosenCategory, quantity, null, description, location, scale);
-
-        if (!TextUtils.isEmpty(mImageUri)) {
+        if (!TextUtils.isEmpty(mImageUri) && imageClicked) {
             UploadImageAsyncTask uploadImageTask = new UploadImageAsyncTask(this, Uri.parse(mImageUri));
             uploadImageTask.execute(getActivity());
         }
-        mViewModel.insertTrain(mTrainToUpdate);
+
+        if(!isEdit){
+            mTrainToUpdate = new Train(null, trainName, reference, mChosenBrand, mChosenCategory, quantity, null, description, location, scale);
+            mViewModel.insertTrain(mTrainToUpdate);
+        } else {
+            mTrainToUpdate = new Train(mChosenTrain.getTrainId(), trainName, reference, mChosenBrand, mChosenCategory, quantity, mChosenTrain.getImageUri(), description, location, scale);
+            mViewModel.updateTrain(mTrainToUpdate);
+        }
 
         //After adding the train, go back to where user come from.
         mUnsavedChangesCallback.warnForUnsavedChanges(false);

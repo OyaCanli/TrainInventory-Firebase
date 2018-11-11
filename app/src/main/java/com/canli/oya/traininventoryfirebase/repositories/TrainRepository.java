@@ -73,18 +73,33 @@ public class TrainRepository {
     public void insertTrain(Train train) {
         //Push the full train object
         DatabaseReference TRAINS_REF = FirebaseUtils.getFullTrainsRef();
-        String trainKey = TRAINS_REF.push().getKey();
-        train.setTrainId(trainKey);
-        trainPushId = trainKey;
-        TRAINS_REF.child(trainKey).setValue(train);
+        trainPushId = TRAINS_REF.push().getKey();
+        train.setTrainId(trainPushId);
+        TRAINS_REF.child(trainPushId).setValue(train);
 
         //Push the minimal train object in multiple locations
         MinimalTrain minimalTrain = FirebaseUtils.getMinimalVersion(train);
         Map<String, Object> trainValues = minimalTrain.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(FirebaseUtils.getMinimalTrainsPath(trainKey), trainValues);
-        childUpdates.put(FirebaseUtils.getTrainsInCategoriesPath(minimalTrain.getCategoryName(), trainKey), trainValues);
-        childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(minimalTrain.getBrandName(), trainKey), trainValues);
+        childUpdates.put(FirebaseUtils.getMinimalTrainsPath(trainPushId), trainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInCategoriesPath(minimalTrain.getCategoryName(), trainPushId), trainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(minimalTrain.getBrandName(), trainPushId), trainValues);
+        FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
+    }
+
+    public void updateTrain(Train train) {
+        //Update the full train object
+        DatabaseReference TRAINS_REF = FirebaseUtils.getFullTrainsRef();
+        trainPushId = train.getTrainId();
+        TRAINS_REF.child(trainPushId).setValue(train);
+
+        //Update the minimal train object in multiple locations
+        MinimalTrain minimalTrain = FirebaseUtils.getMinimalVersion(train);
+        Map<String, Object> trainValues = minimalTrain.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(FirebaseUtils.getMinimalTrainsPath(trainPushId), trainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInCategoriesPath(minimalTrain.getCategoryName(), trainPushId), trainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(minimalTrain.getBrandName(), trainPushId), trainValues);
         FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
     }
 
