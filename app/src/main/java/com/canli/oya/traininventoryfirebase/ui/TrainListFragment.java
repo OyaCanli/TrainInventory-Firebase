@@ -125,10 +125,10 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
     }
 
     @Override
-    public void onListItemClick() {
+    public void onListItemClick(String trainId) {
         TrainDetailsFragment trainDetailsFrag = new TrainDetailsFragment();
         Bundle args = new Bundle();
-        //args.putInt(Constants.TRAIN_ID, trainId);
+        args.putString(Constants.TRAIN_ID, trainId);
         trainDetailsFrag.setArguments(args);
         FragmentManager fm = getFragmentManager();
         fm.beginTransaction()

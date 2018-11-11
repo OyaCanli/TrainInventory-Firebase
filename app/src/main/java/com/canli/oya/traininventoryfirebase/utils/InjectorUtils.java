@@ -5,7 +5,7 @@ import com.canli.oya.traininventoryfirebase.viewmodel.ChosenTrainFactory;
 
 public class InjectorUtils {
 
-    public static ChosenTrainFactory provideChosenTrainFactory(int trainId){
+    public static ChosenTrainFactory provideChosenTrainFactory(String trainId){
         return new ChosenTrainFactory(TrainRepository.getInstance(), trainId);
     }
 

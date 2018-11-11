@@ -31,7 +31,7 @@ public class TrainRepository {
     private TrainRepository() {
         Log.d(TAG, "new instance of TrainRepository");
         FirebaseQueryLiveData allTrains = new FirebaseQueryLiveData(FirebaseUtils.getMinimalTrainsRef());
-        minimalTrains = Transformations.map(allTrains, new Deserializer());
+        minimalTrains = Transformations.map(allTrains, new ListDeserializer());
     }
 
     public static TrainRepository getInstance() {
@@ -43,7 +43,7 @@ public class TrainRepository {
         return sInstance;
     }
 
-    private class Deserializer implements Function<DataSnapshot, List<MinimalTrain>> {
+    private class ListDeserializer implements Function<DataSnapshot, List<MinimalTrain>> {
         @Override
         public List<MinimalTrain> apply(DataSnapshot dataSnapshot) {
             List<MinimalTrain> minimalTrains = new ArrayList<>();
@@ -54,16 +54,21 @@ public class TrainRepository {
         }
     }
 
+    public LiveData<Train> initializeObservingReference(String trainId) {
+        LiveData<Train> chosenTrain;FirebaseQueryLiveData chosenTrainSource = new FirebaseQueryLiveData(FirebaseUtils.getFullTrainsRef().child(trainId));
+        chosenTrain = Transformations.map(chosenTrainSource, new ChosenTrainDeserializer());
+        return chosenTrain;
+    }
+
+    private class ChosenTrainDeserializer implements Function<DataSnapshot, Train> {
+        @Override
+        public Train apply(DataSnapshot dataSnapshot) {
+            return dataSnapshot.getValue(Train.class);
+        }
+    }
+
     public LiveData<List<MinimalTrain>> getMinimalTrains() {
         return minimalTrains;
-    }
-
-    public List<MinimalTrain> getTrainList() {
-        return trainList;
-    }
-
-    public Train getChosenTrain(int trainId) {
-        return null;
     }
 
     public void insertTrain(Train train) {

@@ -8,10 +8,10 @@ import com.canli.oya.traininventoryfirebase.repositories.TrainRepository;
 
 public class ChosenTrainFactory extends ViewModelProvider.NewInstanceFactory {
 
-    private final int mTrainId;
+    private final String mTrainId;
     private TrainRepository mTrainRepo;
 
-    public ChosenTrainFactory(TrainRepository trainRepo, int trainId) {
+    public ChosenTrainFactory(TrainRepository trainRepo, String trainId) {
         mTrainId = trainId;
         mTrainRepo = trainRepo;
     }

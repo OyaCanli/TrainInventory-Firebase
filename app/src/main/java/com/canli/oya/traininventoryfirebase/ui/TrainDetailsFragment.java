@@ -1,5 +1,6 @@
 package com.canli.oya.traininventoryfirebase.ui;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
@@ -29,7 +30,7 @@ public class TrainDetailsFragment extends Fragment {
 
     private FragmentTrainDetailsBinding binding;
     private Train mChosenTrain;
-    private int mTrainId;
+    private String mTrainId;
     private MainViewModel mainViewModel;
 
     public TrainDetailsFragment() {
@@ -51,12 +52,12 @@ public class TrainDetailsFragment extends Fragment {
 
         Bundle bundle = getArguments();
         if (bundle != null) {
-            mTrainId = bundle.getInt(Constants.TRAIN_ID);
+            mTrainId = bundle.getString(Constants.TRAIN_ID);
         }
         mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         ChosenTrainFactory factory = InjectorUtils.provideChosenTrainFactory(mTrainId);
         ChosenTrainViewModel viewModel = ViewModelProviders.of(this, factory).get(ChosenTrainViewModel.class);
-        /*viewModel.getChosenTrain().observe(this, new Observer<Train>() {
+        viewModel.getChosenTrain().observe(this, new Observer<Train>() {
             @Override
             public void onChanged(@Nullable Train train) {
                 if (train != null) {
@@ -64,7 +65,7 @@ public class TrainDetailsFragment extends Fragment {
                     mChosenTrain = train;
                 }
             }
-        });*/
+        });
     }
 
     private void populateUI(Train chosenTrain) {
@@ -89,7 +90,7 @@ public class TrainDetailsFragment extends Fragment {
             case R.id.action_edit: {
                 AddTrainFragment addTrainFrag = new AddTrainFragment();
                 Bundle args = new Bundle();
-                args.putInt(Constants.TRAIN_ID, mTrainId);
+                args.putString(Constants.TRAIN_ID, mTrainId);
                 addTrainFrag.setArguments(args);
                 FragmentManager fm = getFragmentManager();
                 fm.beginTransaction()

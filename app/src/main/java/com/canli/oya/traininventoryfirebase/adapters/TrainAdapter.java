@@ -59,6 +59,6 @@ public class TrainAdapter extends RecyclerView.Adapter<TrainAdapter.TrainViewHol
     }
 
     public interface TrainItemClickListener {
-        void onListItemClick();
+        void onListItemClick(String trainId);
     }
 }
