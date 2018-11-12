@@ -71,6 +71,11 @@ public class FirebaseUtils {
         return null;
     }
 
+    public static StorageReference getImageReferenceFromUrl(String imageUrl) {
+        return FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
+    }
+
+
     public static StorageReference getBrandPhotosRef() {
         String uid = getCurrentUserId();
         if (uid != null) {

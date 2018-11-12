@@ -48,7 +48,6 @@ public class MainViewModel extends ViewModel {
         mTrainRepo.deleteTrain(train);
     }
 
-
     ////////////// BRAND LIST //////////////////
 
     public LiveData<List<Brand>> getBrandList() {

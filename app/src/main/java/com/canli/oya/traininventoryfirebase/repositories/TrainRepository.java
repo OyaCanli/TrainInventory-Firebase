@@ -10,10 +10,11 @@ import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseQueryLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,10 +54,9 @@ public class TrainRepository {
         }
     }
 
-    public LiveData<Train> initializeObservingReference(String trainId) {
-        LiveData<Train> chosenTrain;FirebaseQueryLiveData chosenTrainSource = new FirebaseQueryLiveData(FirebaseUtils.getFullTrainsRef().child(trainId));
-        chosenTrain = Transformations.map(chosenTrainSource, new ChosenTrainDeserializer());
-        return chosenTrain;
+    public LiveData<Train> initializeObservingTrainDetails(String trainId) {
+        FirebaseQueryLiveData chosenTrainSource = new FirebaseQueryLiveData(FirebaseUtils.getFullTrainsRef().child(trainId));
+        return Transformations.map(chosenTrainSource, new ChosenTrainDeserializer());
     }
 
     private class ChosenTrainDeserializer implements Function<DataSnapshot, Train> {
@@ -114,7 +114,34 @@ public class TrainRepository {
     }
 
     public void deleteTrain(Train train) {
+        String trainId = train.getTrainId();
+        //Delete the full train object
+        FirebaseUtils.getFullTrainsRef().child(trainId).removeValue();
 
+        //Delete the minimal train object from multiple locations
+        Map<String, Object> nullTrainValues = new HashMap<>();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(FirebaseUtils.getMinimalTrainsPath(trainPushId), nullTrainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInCategoriesPath(train.getCategoryName(), trainPushId), nullTrainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(train.getBrandName(), trainPushId), nullTrainValues);
+        FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
+
+        //Delete train image, if exists
+        String imageUrl = train.getImageUri();
+        if (imageUrl != null) {
+            FirebaseUtils.getImageReferenceFromUrl(imageUrl)
+                    .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "image successfully deleted");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "error during deleting image");
+                        }
+                    });
+        }
     }
 
     public LiveData<List<MinimalTrain>> getTrainsFromThisBrand(String brandName) {
@@ -128,6 +155,7 @@ public class TrainRepository {
     }
 
     public List<MinimalTrain> searchInTrains(String query) {
+
         return null;
     }
 

@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +33,7 @@ public class TrainDetailsFragment extends Fragment {
     private Train mChosenTrain;
     private String mTrainId;
     private MainViewModel mainViewModel;
+    private static final String TAG = "TrainDetailsFragment";
 
     public TrainDetailsFragment() {
     }
@@ -53,6 +55,7 @@ public class TrainDetailsFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             mTrainId = bundle.getString(Constants.TRAIN_ID);
+            Log.d(TAG, "trainID = " + mTrainId);
         }
         mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         ChosenTrainFactory factory = InjectorUtils.provideChosenTrainFactory(mTrainId);
@@ -115,6 +118,7 @@ public class TrainDetailsFragment extends Fragment {
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                deleteTrain();
             }
         });
         builder.create();
