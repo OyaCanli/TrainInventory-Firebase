@@ -21,8 +21,6 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<Brand> mChosenBrand = new MutableLiveData<>();
 
     public MainViewModel() {
-        mCategoryRepo = CategoryRepository.getInstance();
-        mBrandRepo = BrandRepository.getInstance();
         mTrainRepo = TrainRepository.getInstance(); //TODO: Consider changing this, because no need to load all trains in startup
     }
 
@@ -50,6 +48,10 @@ public class MainViewModel extends ViewModel {
 
     ////////////// BRAND LIST //////////////////
 
+    public void initializeBrandRepo(BrandRepository.BrandUseListener listener){
+        mBrandRepo = BrandRepository.getInstance(listener);
+    }
+
     public LiveData<List<Brand>> getBrandList() {
         return mBrandRepo.getBrandList();
     }
@@ -66,19 +68,23 @@ public class MainViewModel extends ViewModel {
         mBrandRepo.insertBrand(brand);
     }
 
-    public void deleteBrand(Brand brand){
-        mBrandRepo.deleteBrand(brand);
+    public void deleteBrand(String brandName){
+        mBrandRepo.deleteBrand(brandName);
     }
 
     public void updateBrand(Brand brand) {
         mBrandRepo.updateBrand(brand);
     }
 
-    public boolean isThisBrandUsed(String brandName){
-        return mBrandRepo.isThisBrandUsed(brandName);
+    public void isThisBrandUsed(String brandName){
+        mBrandRepo.checkIfThisBrandUsed(brandName);
     }
 
     //////////////// CATEGORY LIST //////////////////
+
+    public void initializeCategoryRepo(CategoryRepository.CategoryUseListener listener){
+        mCategoryRepo = CategoryRepository.getInstance(listener);
+    }
 
     public LiveData<List<String>> getCategoryList() {
         return mCategoryRepo.getCategoryList();
@@ -92,8 +98,8 @@ public class MainViewModel extends ViewModel {
         mCategoryRepo.insertCategory(category);
     }
 
-    public boolean isThisCategoryUsed(String category){
-        return mCategoryRepo.isThisCategoryUsed(category);
+    public void checkIfCategoryUsed(String category){
+        mCategoryRepo.checkIfCategoryUsed(category);
     }
 
     ///////////// SEARCH //////////////////////////

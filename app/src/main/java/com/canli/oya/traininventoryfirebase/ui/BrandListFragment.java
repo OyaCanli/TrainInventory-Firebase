@@ -27,20 +27,23 @@ import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.adapters.BrandAdapter;
+import com.canli.oya.traininventoryfirebase.databinding.FragmentListBinding;
 import com.canli.oya.traininventoryfirebase.model.Brand;
-import com.canli.oya.traininventoryfirebase.databinding.FragmentBrandlistBinding;
-import com.canli.oya.traininventoryfirebase.utils.AppExecutors;
+import com.canli.oya.traininventoryfirebase.repositories.BrandRepository;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 
 import java.util.List;
 
-public class BrandListFragment extends Fragment implements BrandAdapter.BrandItemClickListener{
+public class BrandListFragment extends Fragment implements BrandAdapter.BrandItemClickListener,
+        BrandRepository.BrandUseListener {
 
     private List<Brand> brands;
     private BrandAdapter adapter;
     private MainViewModel mViewModel;
-    private FragmentBrandlistBinding binding;
+    private FragmentListBinding binding;
+    private Brand brandToErase;
+    private CoordinatorLayout coordinator;
 
     public BrandListFragment() {
         setRetainInstance(true);
@@ -50,7 +53,7 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(
-                inflater, R.layout.fragment_brandlist, container, false);
+                inflater, R.layout.fragment_list, container, false);
 
         setHasOptionsMenu(true);
 
@@ -67,6 +70,7 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
         super.onActivityCreated(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        mViewModel.initializeBrandRepo(this);
         mViewModel.getBrandList().observe(BrandListFragment.this, new Observer<List<Brand>>() {
             @Override
             public void onChanged(@Nullable List<Brand> brandEntries) {
@@ -80,9 +84,11 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
                 }
             }
         });
+
         getActivity().setTitle(getString(R.string.all_brands));
 
-        final CoordinatorLayout coordinator = getActivity().findViewById(R.id.coordinator);
+        coordinator = getActivity().findViewById(R.id.coordinator);
+
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -92,40 +98,11 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
             @Override
             public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition();
-
                 //First take a backup of the brand to erase
-                final Brand brandToErase = brands.get(position);
+                brandToErase = brands.get(position);
 
-                AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        //Check whether this brand is used in trains table.
-                        if(mViewModel.isThisBrandUsed(brandToErase.getBrandName())){
-                            // If it is used, show a warning and don't let the user delete this
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getActivity(), R.string.cannot_erase_brand, Toast.LENGTH_LONG).show();
-                                    adapter.notifyDataSetChanged();
-                                }
-                            });
-                        } else {
-                            //If it is not used delete the brand
-                            mViewModel.deleteBrand(brandToErase);
-
-                            //Show a snack bar for undoing delete
-                            Snackbar snackbar = Snackbar
-                                    .make(coordinator, R.string.brand_deleted, Snackbar.LENGTH_INDEFINITE)
-                                    .setAction(R.string.undo, new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            mViewModel.insertBrand(brandToErase);
-                                        }
-                                    });
-                            snackbar.show();
-                        }
-                    }
-                });
+                //Check whether this brand is used in trains table.
+                mViewModel.isThisBrandUsed(brandToErase.getBrandName());
             }
         }).attachToRecyclerView(binding.included.list);
     }
@@ -146,7 +123,7 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.action_add){
+        if (item.getItemId() == R.id.action_add) {
             openAddBrandFragment();
         }
         return super.onOptionsItemSelected(item);
@@ -154,16 +131,16 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
 
     @Override
     public void onBrandItemClicked(View view, Brand clickedBrand) {
-        switch(view.getId()){
-            case R.id.brand_item_web_icon:{
+        switch (view.getId()) {
+            case R.id.brand_item_web_icon: {
                 openWebSite(clickedBrand);
                 break;
             }
-            case R.id.brand_item_train_icon:{
+            case R.id.brand_item_train_icon: {
                 showTrainsFromThisBrand(clickedBrand);
                 break;
             }
-            case R.id.brand_item_edit_icon:{
+            case R.id.brand_item_edit_icon: {
                 editBrand(clickedBrand);
                 break;
             }
@@ -195,21 +172,48 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
                 .commit();
     }
 
-    private void openWebSite(Brand clickedBrand){
+    private void openWebSite(Brand clickedBrand) {
         String urlString = clickedBrand.getWebUrl();
         Uri webUri = null;
-        if(!TextUtils.isEmpty(urlString)){
-            try{
+        if (!TextUtils.isEmpty(urlString)) {
+            try {
                 webUri = Uri.parse(urlString);
-            }catch(Exception e){
+            } catch (Exception e) {
                 Log.e("BrandListFragment", e.toString());
             }
             Intent webIntent = new Intent(Intent.ACTION_VIEW);
             webIntent.setData(webUri);
-            if(webIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            if (webIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                 startActivity(webIntent);
             }
         }
+    }
+
+    @Override
+    public void onBrandUseCaseReturned(boolean isBrandUsed) {
+        if(isBrandUsed){
+            //If brand is used, show a warning an do not delete the brand
+            Toast.makeText(getActivity(), getString(R.string.warning_brand_used), Toast.LENGTH_SHORT).show();
+            adapter.notifyDataSetChanged();
+        } else {
+            //If it is not used, delete the brand
+            deleteBrand();
+        }
+    }
+
+    public void deleteBrand() {
+        mViewModel.deleteBrand(brandToErase.getBrandName());
+
+        //Show a snack bar for undoing delete
+        Snackbar snackbar = Snackbar
+                .make(coordinator, R.string.brand_deleted, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mViewModel.insertBrand(brandToErase);
+                    }
+                });
+        snackbar.show();
     }
 }
 

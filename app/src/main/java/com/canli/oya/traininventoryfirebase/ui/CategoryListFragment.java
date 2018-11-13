@@ -24,8 +24,8 @@ import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.adapters.CategoryAdapter;
-import com.canli.oya.traininventoryfirebase.databinding.FragmentBrandlistBinding;
-import com.canli.oya.traininventoryfirebase.utils.AppExecutors;
+import com.canli.oya.traininventoryfirebase.databinding.FragmentListBinding;
+import com.canli.oya.traininventoryfirebase.repositories.CategoryRepository;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,12 +33,15 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
-public class CategoryListFragment extends Fragment implements CategoryAdapter.CategoryItemClickListener {
+public class CategoryListFragment extends Fragment implements CategoryAdapter.CategoryItemClickListener,
+        CategoryRepository.CategoryUseListener {
 
     private CategoryAdapter mAdapter;
     private List<String> mCategories;
-    private FragmentBrandlistBinding binding;
+    private FragmentListBinding binding;
     private MainViewModel mViewModel;
+    private CoordinatorLayout coordinator;
+    private String categoryToErase;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
         @Override
@@ -71,7 +74,7 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(
-                inflater, R.layout.fragment_brandlist, container, false);
+                inflater, R.layout.fragment_list, container, false);
 
         setHasOptionsMenu(true);
 
@@ -87,12 +90,13 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         getActivity().setTitle(getString(R.string.all_categories));
+        coordinator = getActivity().findViewById(R.id.coordinator);
     }
 
     private void setUpOnSignIn() {
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        mViewModel.initializeCategoryRepo(this);
         mViewModel.getCategoryList().observe(CategoryListFragment.this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> categoryEntries) {
@@ -107,9 +111,7 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
             }
         });
 
-
         //This part is for providing swipe-to-delete functionality, as well as a snack bar to undo deleting
-        final CoordinatorLayout coordinator = getActivity().findViewById(R.id.coordinator);
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -121,39 +123,10 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
                 final int position = viewHolder.getAdapterPosition();
 
                 //First take a backup of the category to erase
-                final String categoryToErase = mCategories.get(position);
+                categoryToErase = mCategories.get(position);
 
-                //Remove the category from the database
-                AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        //First check whether this category is used by trains table
-                        if (mViewModel.isThisCategoryUsed(categoryToErase)) {
-                            // If it is used, show a warning and don't let user delete this
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getActivity(), R.string.cannot_erase_category, Toast.LENGTH_LONG).show();
-                                    mAdapter.notifyDataSetChanged();
-                                }
-                            });
-                        } else {
-                            //If it is not used, erase the category
-                            mViewModel.deleteCategory(categoryToErase);
-                            //Show a snack bar for undoing delete
-                            Snackbar snackbar = Snackbar
-                                    .make(coordinator, R.string.category_deleted, Snackbar.LENGTH_INDEFINITE)
-                                    .setAction(R.string.undo, new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            //If UNDO is clicked, add the item back in the database
-                                            mViewModel.insertCategory(categoryToErase);
-                                        }
-                                    });
-                            snackbar.show();
-                        }
-                    }
-                });
+                //Check whether this category is used by trains table
+                mViewModel.checkIfCategoryUsed(categoryToErase);
             }
         }).attachToRecyclerView(binding.included.list);
     }
@@ -195,4 +168,29 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
                 .commit();
     }
 
+    @Override
+    public void onCategoryUseCaseReturned(boolean isCategoryUsed) {
+        if (isCategoryUsed) {
+            //IF category is used, warn the user and don't erase it.
+            Toast.makeText(getActivity(), R.string.cannot_erase_category, Toast.LENGTH_LONG).show();
+            mAdapter.notifyDataSetChanged();
+        } else {
+            deleteCategory();
+        }
+    }
+
+    private void deleteCategory() {
+        mViewModel.deleteCategory(categoryToErase);
+        //Show a snack bar for undoing delete
+        Snackbar snackbar = Snackbar
+                .make(coordinator, R.string.category_deleted, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //If UNDO is clicked, add the item back in the database
+                        mViewModel.insertCategory(categoryToErase);
+                    }
+                });
+        snackbar.show();
+    }
 }

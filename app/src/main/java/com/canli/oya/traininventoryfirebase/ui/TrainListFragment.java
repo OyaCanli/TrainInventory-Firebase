@@ -21,7 +21,7 @@ import android.view.ViewGroup;
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.adapters.TrainAdapter;
 import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
-import com.canli.oya.traininventoryfirebase.databinding.FragmentListBinding;
+import com.canli.oya.traininventoryfirebase.databinding.FragmentTrainListBinding;
 import com.canli.oya.traininventoryfirebase.utils.AppExecutors;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
@@ -33,7 +33,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
     private TrainAdapter mAdapter;
     private List<MinimalTrain> mTrainList;
     private List<MinimalTrain> filteredTrains;
-    private FragmentListBinding binding;
+    private FragmentTrainListBinding binding;
     private MainViewModel mViewModel;
 
     public TrainListFragment() {
@@ -44,7 +44,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(
-                inflater, R.layout.fragment_list, container, false);
+                inflater, R.layout.fragment_train_list, container, false);
         setHasOptionsMenu(true);
 
         //Set recycler view

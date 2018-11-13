@@ -14,7 +14,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -155,7 +154,7 @@ public class TrainRepository {
     }
 
     public List<MinimalTrain> searchInTrains(String query) {
-
+        //TODO:
         return null;
     }
 
