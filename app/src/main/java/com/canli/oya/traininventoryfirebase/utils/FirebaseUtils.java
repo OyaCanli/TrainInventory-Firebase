@@ -9,9 +9,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class FirebaseUtils {
+public final class FirebaseUtils {
 
-    public static String getCurrentUserId() {
+    private static String getCurrentUserId() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             return user.getUid();
@@ -63,7 +63,7 @@ public class FirebaseUtils {
         return "trainsInBrands/" + brandName+ "/" + trainKey;
     }
 
-    public static StorageReference getTrainPhotosRef() {
+    static StorageReference getTrainPhotosRef() {
         String uid = getCurrentUserId();
         if (uid != null) {
             return FirebaseStorage.getInstance().getReference().child(getCurrentUserId()).child("train_photos" );
@@ -88,7 +88,11 @@ public class FirebaseUtils {
         return new MinimalTrain(train.getTrainId(), train.getTrainName(), train.getModelReference(), train.getBrandName(), train.getCategoryName(), train.getImageUri());
     }
 
+    public static DatabaseReference getSearchLookUpRef(){
+        return getDatabaseUserRef().child("searchLookUp");
+    }
 
-
-
+    public static String getSearchLookUpPath(String trainID){
+        return "searchLookUp/" + trainID;
+    }
 }

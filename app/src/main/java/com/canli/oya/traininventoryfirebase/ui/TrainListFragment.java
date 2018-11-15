@@ -11,30 +11,34 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.adapters.TrainAdapter;
-import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentTrainListBinding;
-import com.canli.oya.traininventoryfirebase.utils.AppExecutors;
+import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TrainListFragment extends Fragment implements TrainAdapter.TrainItemClickListener {
 
     private TrainAdapter mAdapter;
     private List<MinimalTrain> mTrainList;
-    private List<MinimalTrain> filteredTrains;
     private FragmentTrainListBinding binding;
     private MainViewModel mViewModel;
+    private static final String TAG = "TrainListFragment";
+    private Map<String, String> mSearchLookUp;
 
     public TrainListFragment() {
         setRetainInstance(true);
@@ -61,12 +65,13 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
         super.onActivityCreated(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        mViewModel.initializeTrainRepo();
 
         Bundle bundle = getArguments();
         //If the list will be used for showing selected trains
         if (bundle != null && bundle.containsKey(Constants.INTENT_REQUEST_CODE)) {
             String requestType = bundle.getString(Constants.INTENT_REQUEST_CODE);
-            switch(requestType){
+            switch (requestType) {
                 case Constants.TRAINS_OF_BRAND: {
                     String brandName = bundle.getString(Constants.BRAND_NAME);
                     getActivity().setTitle(getString(R.string.trains_of_the_brand, brandName));
@@ -85,7 +90,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                     });
                     break;
                 }
-                case Constants.TRAINS_OF_CATEGORY:{
+                case Constants.TRAINS_OF_CATEGORY: {
                     String categoryName = bundle.getString(Constants.CATEGORY_NAME);
                     getActivity().setTitle(getString(R.string.all_from_this_Category, categoryName));
                     mViewModel.getTrainsFromThisCategory(categoryName).observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
@@ -122,6 +127,12 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 }
             }
         }
+        mViewModel.loadSearchLookUp().observe(this, new Observer<Map<String, String>>() {
+            @Override
+            public void onChanged(@Nullable Map<String, String> searchMap) {
+                mSearchLookUp = searchMap;
+            }
+        });
     }
 
     @Override
@@ -159,24 +170,18 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
     }
 
     private void filterTrains(final String query) {
+        List<MinimalTrain> filteredTrains;
         if (query == null || "".equals(query)) {
             filteredTrains = mTrainList;
             mAdapter.setTrains(filteredTrains);
             mAdapter.notifyDataSetChanged();
         } else {
-            AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    filteredTrains = mViewModel.searchInTrains(query);
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAdapter.setTrains(filteredTrains);
-                            mAdapter.notifyDataSetChanged();
-                        }
-                    });
-                }
-            });
+            filteredTrains = searchInTrains(query);
+            mAdapter.setTrains(filteredTrains);
+            mAdapter.notifyDataSetChanged();
+            if (filteredTrains.isEmpty()) {
+                Toast.makeText(getActivity(), getString(R.string.no_results), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -198,8 +203,26 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 .commit();
     }
 
+    public List<MinimalTrain> searchInTrains(final String query) {
+        //Iterate through the searchLookUp map and save the trainIDs for the items which contain the query text
+        ArrayList<String> resultIds = new ArrayList<>();
+        for (Map.Entry<String, String> pair : mSearchLookUp.entrySet()) {
+            if (pair.getValue().toLowerCase().contains(query.toLowerCase())) {
+                resultIds.add(pair.getKey());
+            }
+        }
+        //Once you have trainIds, get the corresponding minimal train versions
+        List<MinimalTrain> filteredTrainList = new ArrayList<>();
+        for (MinimalTrain minimalTrain : mTrainList) {
+            if (resultIds.contains(minimalTrain.getTrainId())) {
+                Log.d(TAG, "trainID" + minimalTrain.getTrainId());
+                filteredTrainList.add(minimalTrain);
+            }
+        }
+        return filteredTrainList;
+    }
+
     public void scrollToTop() {
         binding.list.smoothScrollToPosition(0);
     }
-
 }

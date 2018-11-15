@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.model.Train;
+import com.canli.oya.traininventoryfirebase.utils.FirebaseLiveDataOnce;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseQueryLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,13 +25,12 @@ public class TrainRepository {
 
     private static TrainRepository sInstance;
     private static final String TAG = "TrainRepository";
-    private final LiveData<List<MinimalTrain>> minimalTrains;
+    private LiveData<List<MinimalTrain>> minimalTrains;
     private String trainPushId;
+    private LiveData<Map<String, String>> mSearchLookUp;
 
     private TrainRepository() {
         Log.d(TAG, "new instance of TrainRepository");
-        FirebaseQueryLiveData allTrains = new FirebaseQueryLiveData(FirebaseUtils.getMinimalTrainsRef());
-        minimalTrains = Transformations.map(allTrains, new ListDeserializer());
     }
 
     public static TrainRepository getInstance() {
@@ -42,7 +42,20 @@ public class TrainRepository {
         return sInstance;
     }
 
-    private class ListDeserializer implements Function<DataSnapshot, List<MinimalTrain>> {
+    ////////////////// ALL TRAINS //////////////////////////
+    public LiveData<List<MinimalTrain>> getAllMinimalTrains() {
+        if(minimalTrains == null || minimalTrains.getValue().isEmpty()){
+            loadAllMinimalTrains();
+        }
+        return minimalTrains;
+    }
+
+    private void loadAllMinimalTrains() {
+        FirebaseQueryLiveData allTrains = new FirebaseQueryLiveData(FirebaseUtils.getMinimalTrainsRef());
+        minimalTrains = Transformations.map(allTrains, new TrainListDeserializer());
+    }
+
+    private class TrainListDeserializer implements Function<DataSnapshot, List<MinimalTrain>> {
         @Override
         public List<MinimalTrain> apply(DataSnapshot dataSnapshot) {
             List<MinimalTrain> minimalTrains = new ArrayList<>();
@@ -53,7 +66,9 @@ public class TrainRepository {
         }
     }
 
-    public LiveData<Train> initializeObservingTrainDetails(String trainId) {
+    ////////////// TRAIN DETAILS /////////////////////////
+
+    public LiveData<Train> getTrainDetails(String trainId) {
         FirebaseQueryLiveData chosenTrainSource = new FirebaseQueryLiveData(FirebaseUtils.getFullTrainsRef().child(trainId));
         return Transformations.map(chosenTrainSource, new ChosenTrainDeserializer());
     }
@@ -63,10 +78,6 @@ public class TrainRepository {
         public Train apply(DataSnapshot dataSnapshot) {
             return dataSnapshot.getValue(Train.class);
         }
-    }
-
-    public LiveData<List<MinimalTrain>> getMinimalTrains() {
-        return minimalTrains;
     }
 
     public void insertTrain(Train train) {
@@ -84,6 +95,14 @@ public class TrainRepository {
         childUpdates.put(FirebaseUtils.getTrainsInCategoriesPath(minimalTrain.getCategoryName(), trainPushId), trainValues);
         childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(minimalTrain.getBrandName(), trainPushId), trainValues);
         FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
+
+        //Put an entry in searchLookUp node, with trainIds as the key and concatenation of fields to look up as a value.
+        String searchText = concatenateFields(train.getTrainName(), train.getModelReference(), train.getDescription());
+        FirebaseUtils.getSearchLookUpRef().child(trainPushId).setValue(searchText);
+    }
+
+    private String concatenateFields(String trainName, String reference, String description){
+        return trainName + " " + reference + " " + description;
     }
 
     public void updateTrain(Train train) {
@@ -100,6 +119,10 @@ public class TrainRepository {
         childUpdates.put(FirebaseUtils.getTrainsInCategoriesPath(minimalTrain.getCategoryName(), trainPushId), trainValues);
         childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(minimalTrain.getBrandName(), trainPushId), trainValues);
         FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
+
+        //Put an entry in searchLookUp node, with trainIds as the key and concatenation of fields to look up as a value.
+        String searchText = concatenateFields(train.getTrainName(), train.getModelReference(), train.getDescription());
+        FirebaseUtils.getSearchLookUpRef().child(trainPushId).setValue(searchText);
     }
 
     public void updateTrainImageUrl(Train trainToUpdate) {
@@ -125,6 +148,9 @@ public class TrainRepository {
         childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(train.getBrandName(), trainPushId), nullTrainValues);
         FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
 
+        //Delete the corresponding entry for search
+        FirebaseUtils.getSearchLookUpRef().child(trainPushId).removeValue();
+
         //Delete train image, if exists
         String imageUrl = train.getImageUri();
         if (imageUrl != null) {
@@ -144,18 +170,31 @@ public class TrainRepository {
     }
 
     public LiveData<List<MinimalTrain>> getTrainsFromThisBrand(String brandName) {
-        FirebaseQueryLiveData livedata = new FirebaseQueryLiveData(FirebaseUtils.getTrainsInBrandsRef().child(brandName));
-        return Transformations.map(livedata, new ListDeserializer());
+        FirebaseLiveDataOnce livedata = new FirebaseLiveDataOnce(FirebaseUtils.getTrainsInBrandsRef().child(brandName));
+        return Transformations.map(livedata, new TrainListDeserializer());
     }
 
     public LiveData<List<MinimalTrain>> getTrainsFromThisCategory(String category) {
-        FirebaseQueryLiveData livedata = new FirebaseQueryLiveData(FirebaseUtils.getTrainsInCategoriesRef().child(category));
-        return Transformations.map(livedata, new ListDeserializer());
+        FirebaseLiveDataOnce livedata = new FirebaseLiveDataOnce(FirebaseUtils.getTrainsInCategoriesRef().child(category));
+        return Transformations.map(livedata, new TrainListDeserializer());
     }
 
-    public List<MinimalTrain> searchInTrains(String query) {
-        //TODO:
-        return null;
+    ////////////////////////// SEARCH //////////////////////////////////
+
+    private class SearchDeserializer implements Function<DataSnapshot, Map<String, String>> {
+        @Override
+        public Map<String, String> apply(DataSnapshot dataSnapshot) {
+            Map<String, String> searchLookup = new HashMap<>();
+            for (DataSnapshot data : dataSnapshot.getChildren()) {
+                searchLookup.put(data.getKey(), data.getValue(String.class));
+            }
+            return searchLookup;
+        }
+    }
+
+    public LiveData<Map<String, String>> loadSearchLookUp(){
+        FirebaseQueryLiveData liveData = new FirebaseQueryLiveData(FirebaseUtils.getSearchLookUpRef());
+        return Transformations.map(liveData, new SearchDeserializer());
     }
 
 }

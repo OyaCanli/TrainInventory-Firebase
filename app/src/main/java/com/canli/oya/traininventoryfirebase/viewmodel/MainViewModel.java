@@ -12,6 +12,7 @@ import com.canli.oya.traininventoryfirebase.repositories.CategoryRepository;
 import com.canli.oya.traininventoryfirebase.repositories.TrainRepository;
 
 import java.util.List;
+import java.util.Map;
 
 public class MainViewModel extends ViewModel {
 
@@ -20,14 +21,13 @@ public class MainViewModel extends ViewModel {
     private CategoryRepository mCategoryRepo;
     private final MutableLiveData<Brand> mChosenBrand = new MutableLiveData<>();
 
-    public MainViewModel() {
-        mTrainRepo = TrainRepository.getInstance(); //TODO: Consider changing this, because no need to load all trains in startup
+    /////////// TRAIN LIST /////////////
+    public void initializeTrainRepo(){
+        mTrainRepo = TrainRepository.getInstance();
     }
 
-    /////////// TRAIN LIST /////////////
-
     public LiveData<List<MinimalTrain>> getTrainList() {
-        return mTrainRepo.getMinimalTrains();
+        return mTrainRepo.getAllMinimalTrains();
     }
 
     public void insertTrain(Train train){
@@ -111,7 +111,7 @@ public class MainViewModel extends ViewModel {
         return mTrainRepo.getTrainsFromThisCategory(category);
     }
 
-    public List<MinimalTrain> searchInTrains(String query){
-        return mTrainRepo.searchInTrains(query);
+    public LiveData<Map<String, String>> loadSearchLookUp(){
+        return mTrainRepo.loadSearchLookUp();
     }
 }

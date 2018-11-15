@@ -146,6 +146,8 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         super.onActivityCreated(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        mViewModel.initializeBrandRepo(null);
+        mViewModel.initializeCategoryRepo(null);
 
         //Set brand spinner
         brandList = new ArrayList<>();

@@ -11,7 +11,7 @@ public class ChosenTrainViewModel extends ViewModel {
     private final LiveData<Train> chosenTrain;
 
     ChosenTrainViewModel(TrainRepository trainRepo, String trainId) {
-        chosenTrain = trainRepo.initializeObservingTrainDetails(trainId);
+        chosenTrain = trainRepo.getTrainDetails(trainId);
     }
 
     public LiveData<Train> getChosenTrain() {

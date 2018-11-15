@@ -70,4 +70,5 @@
     <string name="trains_of_the_brand">Trains of the brand %1$s</string>
     <string name="all_from_this_Category">All %1$ss</string>
     <string name="warning_brand_used">This brand is used by some trains. You cannot erase it.</string>
+    <string name="no_results">No results found</string>
 </resources>
