@@ -339,7 +339,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         String scale = binding.editScale.getText().toString().trim();
 
         if (!TextUtils.isEmpty(mImageUri) && imageClicked) {
-            UploadImageAsyncTask uploadImageTask = new UploadImageAsyncTask(this, Uri.parse(mImageUri));
+            UploadImageAsyncTask uploadImageTask = new UploadImageAsyncTask(this, Uri.parse(mImageUri), Constants.TRAIN_IMAGE);
             uploadImageTask.execute(getActivity());
         }
 

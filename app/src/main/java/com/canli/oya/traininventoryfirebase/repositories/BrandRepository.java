@@ -61,8 +61,8 @@ public class BrandRepository {
         FirebaseUtils.getBrandsRef().child(brand.getBrandName()).setValue(brand);
     }
 
-    public void updateBrand(final Brand brand){
-
+    public void updateBrandImageUrl(Brand brand){
+        FirebaseUtils.getBrandsRef().child(brand.getBrandName()).child("brandLogoUri").setValue(brand.getBrandLogoUri());
     }
 
     public void deleteBrand(String brandName){

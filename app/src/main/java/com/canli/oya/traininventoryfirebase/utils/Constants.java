@@ -52,4 +52,9 @@ public final class Constants {
     public static final String IMAGE_URL = "imageUrl";
 
     public static final String UNSAVED_CHANGES = "unsavedChanges";
+
+    //constants for distinguishing brand or train cases for upload image task
+    public static final int TRAIN_IMAGE = 1;
+
+    public static final int BRAND_IMAGE = 2;
 }

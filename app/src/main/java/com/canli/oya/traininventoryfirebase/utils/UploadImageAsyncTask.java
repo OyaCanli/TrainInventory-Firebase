@@ -31,10 +31,13 @@ public class UploadImageAsyncTask extends AsyncTask<Context, Void, Void> {
     private static final int IMAGE_MAX_DIMENSION = 640;
     private ImageUploadListener mCallback;
     private Uri mUri;
+    private int mImageType;
+    private StorageReference photoRef;
 
-    public UploadImageAsyncTask(ImageUploadListener listener, Uri uri) {
+    public UploadImageAsyncTask(ImageUploadListener listener, Uri uri, int imageType) {
         mCallback = listener;
         mUri = uri;
+        mImageType = imageType;
     }
 
     @Override
@@ -58,9 +61,14 @@ public class UploadImageAsyncTask extends AsyncTask<Context, Void, Void> {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
         byte[] bytes = stream.toByteArray();
 
-        //Finally push to Firebase Storage
-        final StorageReference photoRef = FirebaseUtils.getTrainPhotosRef().child(mUri.getLastPathSegment());
+        //Get the correct storage reference according to image type
+        if(mImageType == Constants.BRAND_IMAGE){
+            photoRef = FirebaseUtils.getBrandPhotosRef().child(mUri.getLastPathSegment());
+        } else {
+            photoRef = FirebaseUtils.getTrainPhotosRef().child(mUri.getLastPathSegment());
+        }
 
+        //Finally push to Firebase Storage
         photoRef.putBytes(bytes).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
             public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {

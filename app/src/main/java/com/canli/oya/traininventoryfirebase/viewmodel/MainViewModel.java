@@ -73,7 +73,11 @@ public class MainViewModel extends ViewModel {
     }
 
     public void updateBrand(Brand brand) {
-        mBrandRepo.updateBrand(brand);
+        mBrandRepo.insertBrand(brand);
+    }
+
+    public void updateBrandImageUrl(Brand brandToUpdate){
+        mBrandRepo.updateBrandImageUrl(brandToUpdate);
     }
 
     public void isThisBrandUsed(String brandName){

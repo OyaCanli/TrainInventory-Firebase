@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +29,11 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentAddBrandBinding;
+import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.utils.BitmapUtils;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
+import com.canli.oya.traininventoryfirebase.utils.UploadImageAsyncTask;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 
 import java.io.File;
@@ -39,7 +41,7 @@ import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AddBrandFragment extends Fragment implements View.OnClickListener {
+public class AddBrandFragment extends Fragment implements View.OnClickListener, UploadImageAsyncTask.ImageUploadListener {
 
     private AlertDialog pickImageDialog;
     private String mTempPhotoPath;
@@ -47,9 +49,11 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener {
     private int mUsersChoice;
     private boolean isUpdateCase;
     private Context mContext;
-    private int mBrandId;
     private FragmentAddBrandBinding binding;
     private MainViewModel mViewModel;
+    private boolean imageClicked;
+    private Brand mBrandToUpdate;
+    private static final String TAG = "AddBrandFragment";
 
     private final DialogInterface.OnClickListener mDialogClickListener = new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int item) {
@@ -112,6 +116,7 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener {
             saveBrand();
         } else {
             //If add photo is clicked
+            imageClicked = true;
             openImageDialog();
         }
     }
@@ -125,14 +130,16 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener {
 
         //If there is a uri for logo image, parse it to string
         String imagePath = null;
-        if (mLogoUri != null) {
+        if (imageClicked && mLogoUri != null) {
             imagePath = mLogoUri.toString();
+            UploadImageAsyncTask uploadImageTask = new UploadImageAsyncTask(this, mLogoUri, Constants.BRAND_IMAGE);
+            uploadImageTask.execute(getActivity());
         }
 
         if (isUpdateCase) {
             //Construct a new Brand object from this data with ID included
-            final Brand brandToUpdate = new Brand(brandName, imagePath, webAddress);
-            mViewModel.updateBrand(brandToUpdate);
+            mBrandToUpdate = new Brand(brandName, imagePath, webAddress);
+            mViewModel.updateBrand(mBrandToUpdate);
 
         } else {
             //Construct a new Brand object from this data (without ID)
@@ -281,8 +288,6 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -303,5 +308,12 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener {
             return dummyAnimation;
         }
         return super.onCreateAnimation(transit, enter, nextAnim);
+    }
+
+    @Override
+    public void onImageUploaded(Uri imageUri) {
+        Log.d(TAG, "onImageUploaded called");
+        mBrandToUpdate.setBrandLogoUri(imageUri.toString());
+        mViewModel.updateBrandImageUrl(mBrandToUpdate);
     }
 }

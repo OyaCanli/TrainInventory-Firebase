@@ -27,16 +27,14 @@ public final class FirebaseUtils {
         return null;
     }
 
+    //////////////REFERENCES FOR MAIN NODES ///////////////////
+
     public static DatabaseReference getFullTrainsRef() {
         return getDatabaseUserRef().child("trains");
     }
 
     public static DatabaseReference getMinimalTrainsRef() {
         return getDatabaseUserRef().child("minimalTrains");
-    }
-
-    public static String getMinimalTrainsPath(String trainKey) {
-        return "minimalTrains/" + trainKey;
     }
 
     public static DatabaseReference getCategoriesRef() {
@@ -47,10 +45,6 @@ public final class FirebaseUtils {
         return getDatabaseUserRef().child("brands");
     }
 
-    public static String getTrainsInCategoriesPath(String categoryName, String trainKey) {
-        return "trainsInCategories/" + categoryName + "/" + trainKey;
-    }
-
     public static DatabaseReference getTrainsInCategoriesRef() {
         return getDatabaseUserRef().child("trainsInCategories");
     }
@@ -59,10 +53,26 @@ public final class FirebaseUtils {
         return getDatabaseUserRef().child("trainsInBrands");
     }
 
+    public static DatabaseReference getSearchLookUpRef(){
+        return getDatabaseUserRef().child("searchLookUp");
+    }
+
+    ///////////////  STRING PATHS TO USE IN UPDATES //////////////
+    public static String getMinimalTrainsPath(String trainKey) {
+        return "minimalTrains/" + trainKey;
+    }
+
+    public static String getTrainsInCategoriesPath(String categoryName, String trainKey) {
+        return "trainsInCategories/" + categoryName + "/" + trainKey;
+    }
+
+
     public static String getTrainsInBrandsPath(String brandName, String trainKey) {
         return "trainsInBrands/" + brandName+ "/" + trainKey;
     }
 
+
+    //////////// REFERENCES FOR FIREBASE STORAGE ///////////////////////////
     static StorageReference getTrainPhotosRef() {
         String uid = getCurrentUserId();
         if (uid != null) {
@@ -75,21 +85,16 @@ public final class FirebaseUtils {
         return FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
     }
 
-
     public static StorageReference getBrandPhotosRef() {
         String uid = getCurrentUserId();
         if (uid != null) {
-            return FirebaseStorage.getInstance().getReference().child(getCurrentUserId()).child("brands" );
+            return FirebaseStorage.getInstance().getReference().child(getCurrentUserId()).child("brand_logos" );
         }
         return null;
     }
 
     public static MinimalTrain getMinimalVersion(Train train){
         return new MinimalTrain(train.getTrainId(), train.getTrainName(), train.getModelReference(), train.getBrandName(), train.getCategoryName(), train.getImageUri());
-    }
-
-    public static DatabaseReference getSearchLookUpRef(){
-        return getDatabaseUserRef().child("searchLookUp");
     }
 
     public static String getSearchLookUpPath(String trainID){
