@@ -99,10 +99,21 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
 
 
     @Override
-    public void onImageUploaded(Uri imageUri) {
+    public void onImageUploaded(Uri imageUri, boolean loadingSuccessful) {
         Log.d(TAG, "onImageUploaded called");
-        mTrainToUpdate.setImageUri(imageUri.toString());
-        mViewModel.updateTrainImageUrl(mTrainToUpdate);
+        if(loadingSuccessful){
+            if(isEdit) {
+                String previousUrl = mTrainToUpdate.getImageUri();
+                mTrainToUpdate.setImageUri(imageUri.toString());
+                mViewModel.updateTrainImageUrl(mTrainToUpdate);
+                mViewModel.deleteUnusedImage(previousUrl);
+            } else {
+                mTrainToUpdate.setImageUri(imageUri.toString());
+                mViewModel.updateTrainImageUrl(mTrainToUpdate);
+            }
+        } else {
+            Toast.makeText(getActivity(), getString(R.string.error_during_image_loading), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public interface UnsavedChangesListener {
@@ -248,6 +259,9 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     }
 
     private void setSpinners() {
+        /*Before setting spinners, we should make sure that all these three data are loaded.
+        And since their loading order can vary, I call this method ech time one of these
+        items are loaded, but it will only work when all three are loaded.*/
         if(trainLoaded && categoryLoaded && brandsLoaded){
             //Set category spinner
             binding.categorySpinner.setSelection(categoryList.indexOf(mChosenTrain.getCategoryName()));
@@ -338,6 +352,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
                 binding.editLocationLetter.getText().toString().trim();
         String scale = binding.editScale.getText().toString().trim();
 
+        //Upload the image only if user tempted to add/change the image and if there is a non-null uri
         if (!TextUtils.isEmpty(mImageUri) && imageClicked) {
             UploadImageAsyncTask uploadImageTask = new UploadImageAsyncTask(this, Uri.parse(mImageUri), Constants.TRAIN_IMAGE);
             uploadImageTask.execute(getActivity());

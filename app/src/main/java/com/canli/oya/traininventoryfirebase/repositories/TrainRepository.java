@@ -27,7 +27,6 @@ public class TrainRepository {
     private static final String TAG = "TrainRepository";
     private LiveData<List<MinimalTrain>> minimalTrains;
     private String trainPushId;
-    private LiveData<Map<String, String>> mSearchLookUp;
 
     private TrainRepository() {
         Log.d(TAG, "new instance of TrainRepository");
@@ -120,7 +119,7 @@ public class TrainRepository {
         childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(minimalTrain.getBrandName(), trainPushId), trainValues);
         FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
 
-        //Put an entry in searchLookUp node, with trainIds as the key and concatenation of fields to look up as a value.
+        //Edit the entry in searchLookUp node, with trainIds as the key and concatenation of fields to look up as a value.
         String searchText = concatenateFields(train.getTrainName(), train.getModelReference(), train.getDescription());
         FirebaseUtils.getSearchLookUpRef().child(trainPushId).setValue(searchText);
     }
@@ -152,7 +151,11 @@ public class TrainRepository {
         FirebaseUtils.getSearchLookUpRef().child(trainPushId).removeValue();
 
         //Delete train image, if exists
-        String imageUrl = train.getImageUri();
+        deleteImage(train.getImageUri());
+    }
+
+    public void deleteImage(String imageUrl) {
+        //Delete train image, if exists
         if (imageUrl != null) {
             FirebaseUtils.getImageReferenceFromUrl(imageUrl)
                     .delete().addOnSuccessListener(new OnSuccessListener<Void>() {

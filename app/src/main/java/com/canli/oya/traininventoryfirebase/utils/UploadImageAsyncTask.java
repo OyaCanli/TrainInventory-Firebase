@@ -24,7 +24,7 @@ import java.io.InputStream;
 public class UploadImageAsyncTask extends AsyncTask<Context, Void, Void> {
 
     public interface ImageUploadListener {
-        void onImageUploaded(Uri imageUri);
+        void onImageUploaded(Uri imageUri, boolean loadingSuccessful);
     }
 
     private static final String TAG = "UploadImageAsynctask";
@@ -32,7 +32,7 @@ public class UploadImageAsyncTask extends AsyncTask<Context, Void, Void> {
     private ImageUploadListener mCallback;
     private Uri mUri;
     private int mImageType;
-    private StorageReference photoRef;
+    private StorageReference mPhotoRef;
 
     public UploadImageAsyncTask(ImageUploadListener listener, Uri uri, int imageType) {
         mCallback = listener;
@@ -63,32 +63,33 @@ public class UploadImageAsyncTask extends AsyncTask<Context, Void, Void> {
 
         //Get the correct storage reference according to image type
         if(mImageType == Constants.BRAND_IMAGE){
-            photoRef = FirebaseUtils.getBrandPhotosRef().child(mUri.getLastPathSegment());
+            mPhotoRef = FirebaseUtils.getBrandPhotosRef().child(mUri.getLastPathSegment());
         } else {
-            photoRef = FirebaseUtils.getTrainPhotosRef().child(mUri.getLastPathSegment());
+            mPhotoRef = FirebaseUtils.getTrainPhotosRef().child(mUri.getLastPathSegment());
         }
 
         //Finally push to Firebase Storage
-        photoRef.putBytes(bytes).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+        mPhotoRef.putBytes(bytes).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
             public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                 if (!task.isSuccessful()) {
                     throw task.getException();
                 }
-                return photoRef.getDownloadUrl();
+                return mPhotoRef.getDownloadUrl();
             }
         }).addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
-                    mCallback.onImageUploaded(downloadUri);
+                    mCallback.onImageUploaded(downloadUri, true);
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "photo is not successfully uploaded");
+                mCallback.onImageUploaded(null, false);
             }
         });
         return null;

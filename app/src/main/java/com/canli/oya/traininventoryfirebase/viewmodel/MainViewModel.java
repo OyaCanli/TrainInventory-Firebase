@@ -21,10 +21,11 @@ public class MainViewModel extends ViewModel {
     private CategoryRepository mCategoryRepo;
     private final MutableLiveData<Brand> mChosenBrand = new MutableLiveData<>();
 
-    /////////// TRAIN LIST /////////////
-    public void initializeTrainRepo(){
+    public MainViewModel() {
         mTrainRepo = TrainRepository.getInstance();
     }
+
+    /////////// TRAIN LIST /////////////
 
     public LiveData<List<MinimalTrain>> getTrainList() {
         return mTrainRepo.getAllMinimalTrains();
@@ -40,6 +41,10 @@ public class MainViewModel extends ViewModel {
 
     public void updateTrainImageUrl(Train trainToUpdate){
         mTrainRepo.updateTrainImageUrl(trainToUpdate);
+    }
+
+    public void deleteUnusedImage(String imageUrlToDelete){
+        mTrainRepo.deleteImage(imageUrlToDelete);
     }
 
     public void deleteTrain(Train train){

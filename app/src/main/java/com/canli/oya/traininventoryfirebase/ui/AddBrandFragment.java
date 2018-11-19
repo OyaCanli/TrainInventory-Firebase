@@ -47,12 +47,13 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener, 
     private String mTempPhotoPath;
     private Uri mLogoUri;
     private int mUsersChoice;
-    private boolean isUpdateCase;
+    private boolean isEdit;
     private Context mContext;
     private FragmentAddBrandBinding binding;
     private MainViewModel mViewModel;
     private boolean imageClicked;
     private Brand mBrandToUpdate;
+    private Brand mChosenBrand;
     private static final String TAG = "AddBrandFragment";
 
     private final DialogInterface.OnClickListener mDialogClickListener = new DialogInterface.OnClickListener() {
@@ -94,11 +95,12 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener, 
 
         Bundle bundle = getArguments();
         if (bundle != null && bundle.containsKey(Constants.INTENT_REQUEST_CODE)) { //This is the "edit" case
-            isUpdateCase = true;
+            isEdit = true;
             mViewModel.getChosenBrand().observe(AddBrandFragment.this, new Observer<Brand>() {
                 @Override
                 public void onChanged(@Nullable Brand brand) {
                     populateFields(brand);
+                    mChosenBrand = brand;
                 }
             });
         }
@@ -129,23 +131,21 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener, 
         String webAddress = binding.addBrandEditWeb.getText().toString().trim();
 
         //If there is a uri for logo image, parse it to string
-        String imagePath = null;
         if (imageClicked && mLogoUri != null) {
-            imagePath = mLogoUri.toString();
             UploadImageAsyncTask uploadImageTask = new UploadImageAsyncTask(this, mLogoUri, Constants.BRAND_IMAGE);
             uploadImageTask.execute(getActivity());
         }
 
-        if (isUpdateCase) {
+        if (isEdit) {
             //Construct a new Brand object from this data with ID included
-            mBrandToUpdate = new Brand(brandName, imagePath, webAddress);
+            mBrandToUpdate = new Brand(brandName, mChosenBrand.getBrandLogoUri(), webAddress);
             mViewModel.updateBrand(mBrandToUpdate);
 
         } else {
             //Construct a new Brand object from this data (without ID)
-            final Brand newBrand = new Brand(brandName, imagePath, webAddress);
+            mBrandToUpdate = new Brand(brandName, null, webAddress);
             //Insert to database in a background thread
-            mViewModel.insertBrand(newBrand);
+            mViewModel.insertBrand(mBrandToUpdate);
         }
 
         Toast.makeText(getActivity(), R.string.brand_Saved, Toast.LENGTH_SHORT).show();
@@ -311,9 +311,20 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener, 
     }
 
     @Override
-    public void onImageUploaded(Uri imageUri) {
+    public void onImageUploaded(Uri imageUri, boolean loadingSuccessful) {
         Log.d(TAG, "onImageUploaded called");
-        mBrandToUpdate.setBrandLogoUri(imageUri.toString());
-        mViewModel.updateBrandImageUrl(mBrandToUpdate);
+        if(loadingSuccessful){
+            if(isEdit) {
+                String previousUrl = mBrandToUpdate.getBrandLogoUri();
+                mBrandToUpdate.setBrandLogoUri(imageUri.toString());
+                mViewModel.updateBrandImageUrl(mBrandToUpdate);
+                mViewModel.deleteUnusedImage(previousUrl);
+            } else {
+                mBrandToUpdate.setBrandLogoUri(imageUri.toString());
+                mViewModel.updateBrandImageUrl(mBrandToUpdate);
+            }
+        } else {
+            Toast.makeText(getActivity(), getString(R.string.error_during_image_loading), Toast.LENGTH_SHORT).show();
+        }
     }
 }

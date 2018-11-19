@@ -71,4 +71,5 @@
     <string name="all_from_this_Category">All %1$ss</string>
     <string name="warning_brand_used">This brand is used by some trains. You cannot erase it.</string>
     <string name="no_results">No results found</string>
+    <string name="error_during_image_loading">There was an error during image upload</string>
 </resources>

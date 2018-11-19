@@ -65,8 +65,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
         super.onActivityCreated(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        mViewModel.initializeTrainRepo();
-
+        
         Bundle bundle = getArguments();
         //If the list will be used for showing selected trains
         if (bundle != null && bundle.containsKey(Constants.INTENT_REQUEST_CODE)) {
