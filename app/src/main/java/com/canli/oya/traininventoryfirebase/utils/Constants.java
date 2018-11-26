@@ -11,7 +11,7 @@ public final class Constants {
     public static final int PICK_IMAGE_REQUEST = 3;
 
     //Provider name for saving the image
-    public static final String FILE_PROVIDER_AUTHORITY = "com.canli.oya.traininventory.fileprovider";
+    public static final String FILE_PROVIDER_AUTHORITY = "com.canli.oya.traininventoryfirebase.fileprovider";
 
     //Intent extras:
     public static final String TRAIN_ID = "trainId";
