@@ -71,9 +71,9 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.initializeBrandRepo(this);
-        mViewModel.getBrandList().observe(BrandListFragment.this, new Observer<List>() {
+        mViewModel.getBrandList().observe(BrandListFragment.this, new Observer<List<Brand>>() {
             @Override
-            public void onChanged(@Nullable List brandEntries) {
+            public void onChanged(@Nullable List<Brand> brandEntries) {
                 if (brandEntries == null || brandEntries.isEmpty()) {
                     binding.included.setIsEmpty(true);
                     binding.included.setEmptyMessage(getString(R.string.no_brands_found));

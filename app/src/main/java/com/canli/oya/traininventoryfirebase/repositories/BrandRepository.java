@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.model.Brand;
-import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseLiveDataList;
-import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseUtils;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.BrandListLiveData;
+import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -14,13 +14,13 @@ public class BrandRepository {
 
     private static BrandRepository sInstance;
     private static final String TAG = "BrandRepository";
-    private final FirebaseLiveDataList brandList;
+    private final BrandListLiveData brandList;
     private boolean brandIsUsed;
     private BrandUseListener mCallback;
 
     private BrandRepository(BrandUseListener listener) {
         Log.d(TAG, "new instance of BrandRepository");
-        brandList = new FirebaseLiveDataList(FirebaseUtils.getBrandsRef(), Brand.class);
+        brandList = new BrandListLiveData(FirebaseUtils.getBrandsRef());
         mCallback = listener;
     }
 
@@ -33,7 +33,7 @@ public class BrandRepository {
         return sInstance;
     }
 
-    public FirebaseLiveDataList getBrandList() {
+    public BrandListLiveData getBrandList() {
         return brandList;
     }
 

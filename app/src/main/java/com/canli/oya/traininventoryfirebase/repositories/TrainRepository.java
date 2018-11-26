@@ -8,9 +8,11 @@ import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.model.Train;
-import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseLiveDataList;
-import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseQueryLiveData;
-import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseUtils;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.FetchOnceLiveData;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.SearchMapLiveData;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.TrainListLiveData;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.ChosenTrainLiveData;
+import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -27,7 +29,7 @@ public class TrainRepository {
     private static final String TAG = "TrainRepository";
     //private LiveData<List<MinimalTrain>> minimalTrains;
     private String trainPushId;
-    FirebaseLiveDataList minimalTrains;
+    private TrainListLiveData minimalTrains;
 
     private TrainRepository() {
         Log.d(TAG, "new instance of TrainRepository");
@@ -43,29 +45,17 @@ public class TrainRepository {
     }
 
     ////////////////// ALL TRAINS //////////////////////////
-    public FirebaseLiveDataList getAllMinimalTrains() {
+    public TrainListLiveData getAllMinimalTrains() {
         if(minimalTrains == null || minimalTrains.getValue().isEmpty()){
-            minimalTrains = new FirebaseLiveDataList(FirebaseUtils.getMinimalTrainsRef(), MinimalTrain.class);
+            minimalTrains = new TrainListLiveData(FirebaseUtils.getMinimalTrainsRef());
         }
         return minimalTrains;
-    }
-
-
-    private class TrainListDeserializer implements Function<DataSnapshot, List<MinimalTrain>> {
-        @Override
-        public List<MinimalTrain> apply(DataSnapshot dataSnapshot) {
-            List<MinimalTrain> minimalTrains = new ArrayList<>();
-            for (DataSnapshot data : dataSnapshot.getChildren()) {
-                minimalTrains.add(data.getValue(MinimalTrain.class));
-            }
-            return minimalTrains;
-        }
     }
 
     ////////////// TRAIN DETAILS /////////////////////////
 
     public LiveData<Train> getTrainDetails(String trainId) {
-        FirebaseQueryLiveData chosenTrainSource = new FirebaseQueryLiveData(FirebaseUtils.getFullTrainsRef().child(trainId));
+        ChosenTrainLiveData chosenTrainSource = new ChosenTrainLiveData(FirebaseUtils.getFullTrainsRef().child(trainId));
         return Transformations.map(chosenTrainSource, new ChosenTrainDeserializer());
     }
 
@@ -139,13 +129,13 @@ public class TrainRepository {
         //Delete the minimal train object from multiple locations
         Map<String, Object> nullTrainValues = new HashMap<>();
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(FirebaseUtils.getMinimalTrainsPath(trainPushId), nullTrainValues);
-        childUpdates.put(FirebaseUtils.getTrainsInCategoriesPath(train.getCategoryName(), trainPushId), nullTrainValues);
-        childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(train.getBrandName(), trainPushId), nullTrainValues);
+        childUpdates.put(FirebaseUtils.getMinimalTrainsPath(trainId), nullTrainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInCategoriesPath(train.getCategoryName(), trainId), nullTrainValues);
+        childUpdates.put(FirebaseUtils.getTrainsInBrandsPath(train.getBrandName(), trainId), nullTrainValues);
         FirebaseUtils.getDatabaseUserRef().updateChildren(childUpdates);
 
         //Delete the corresponding entry for search
-        FirebaseUtils.getSearchLookUpRef().child(trainPushId).removeValue();
+        FirebaseUtils.getSearchLookUpRef().child(trainId).removeValue();
 
         //Delete train image, if exists
         deleteImage(train.getImageUri());
@@ -169,30 +159,31 @@ public class TrainRepository {
         }
     }
 
-    public FirebaseLiveDataList getTrainsFromThisBrand(String brandName) {
-        return new FirebaseLiveDataList(FirebaseUtils.getTrainsInBrandsRef().child(brandName), MinimalTrain.class);
+    public LiveData<List<MinimalTrain>> getTrainsFromThisBrand(String brandName) {
+        FetchOnceLiveData livedata = new FetchOnceLiveData(FirebaseUtils.getTrainsInBrandsRef().child(brandName));
+        return Transformations.map(livedata, new TrainListDeserializer());
     }
 
-    public FirebaseLiveDataList getTrainsFromThisCategory(String category) {
-        return new FirebaseLiveDataList(FirebaseUtils.getTrainsInCategoriesRef().child(category), MinimalTrain.class);
+    public LiveData<List<MinimalTrain>> getTrainsFromThisCategory(String category) {
+        FetchOnceLiveData livedata = new FetchOnceLiveData(FirebaseUtils.getTrainsInCategoriesRef().child(category));
+        return Transformations.map(livedata, new TrainListDeserializer());
+    }
+
+    private class TrainListDeserializer implements Function<DataSnapshot, List<MinimalTrain>> {
+        @Override
+        public List<MinimalTrain> apply(DataSnapshot dataSnapshot) {
+            List<MinimalTrain> minimalTrains = new ArrayList<>();
+            for (DataSnapshot data : dataSnapshot.getChildren()) {
+                minimalTrains.add(data.getValue(MinimalTrain.class));
+            }
+            return minimalTrains;
+        }
     }
 
     ////////////////////////// SEARCH //////////////////////////////////
 
-    private class SearchDeserializer implements Function<DataSnapshot, Map<String, String>> {
-        @Override
-        public Map<String, String> apply(DataSnapshot dataSnapshot) {
-            Map<String, String> searchLookup = new HashMap<>();
-            for (DataSnapshot data : dataSnapshot.getChildren()) {
-                searchLookup.put(data.getKey(), data.getValue(String.class));
-            }
-            return searchLookup;
-        }
-    }
-
     public LiveData<Map<String, String>> loadSearchLookUp(){
-        FirebaseQueryLiveData liveData = new FirebaseQueryLiveData(FirebaseUtils.getSearchLookUpRef());
-        return Transformations.map(liveData, new SearchDeserializer());
+        return new SearchMapLiveData(FirebaseUtils.getSearchLookUpRef());
     }
 
 }

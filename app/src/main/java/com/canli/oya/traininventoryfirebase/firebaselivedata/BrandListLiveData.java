@@ -1,10 +1,11 @@
-package com.canli.oya.traininventoryfirebase.utils.firebaseutils;
+package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,24 +15,15 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FirebaseLiveDataList extends LiveData<List> {
-    private static final String LOG_TAG = "FirebaseQueryLiveData";
+public class BrandListLiveData extends LiveData<List<Brand>> {
+    private static final String LOG_TAG = "BrandListLiveData";
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
-    private List firebaseData;
-    private Class mModel;
+    private List<Brand> brandList = new ArrayList<>();
 
-    public FirebaseLiveDataList(Query query, Class model) {
-        this.query = query;
-        firebaseData = new ArrayList<>();
-        mModel = model;
-    }
-
-    public FirebaseLiveDataList(DatabaseReference ref, Class model) {
+    public BrandListLiveData(DatabaseReference ref) {
         this.query = ref;
-        firebaseData = new ArrayList<>();
-        mModel = model;
     }
 
     @Override
@@ -44,26 +36,40 @@ public class FirebaseLiveDataList extends LiveData<List> {
     protected void onInactive() {
         Log.d(LOG_TAG, "onInactive");
         query.removeEventListener(listener);
-        firebaseData.clear();
+        brandList.clear();
     }
 
     private class MyValueEventListener implements ChildEventListener {
 
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            firebaseData.add(dataSnapshot.getValue(mModel));
-            setValue(firebaseData);
-            Log.d(LOG_TAG, "onChildAdded. list size: " + firebaseData.size());
+            brandList.add(dataSnapshot.getValue(Brand.class));
+            setValue(brandList);
+            Log.d(LOG_TAG, "onChildAdded. list size: " + brandList.size());
         }
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+            String brandID = dataSnapshot.getKey();
+            int listSize = brandList.size();
+            for(int i = 0 ; i < listSize ; i++){
+                if(brandID.equals(brandList.get(i).getBrandName())){
+                    brandList.set(i, dataSnapshot.getValue(Brand.class));
+                    setValue(brandList);
+                }
+            }
+            Log.d(LOG_TAG, "onChildChanged. list size: " + listSize);
         }
 
         @Override
         public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
+            String brandId = dataSnapshot.getKey();
+            for(Brand brand : brandList){
+                if(brandId.equals(brand.getBrandName())){
+                    brandList.remove(brand);
+                }
+            }
+            Log.d(LOG_TAG, "onChildRemoved. list size: " + brandList.size());
         }
 
         @Override

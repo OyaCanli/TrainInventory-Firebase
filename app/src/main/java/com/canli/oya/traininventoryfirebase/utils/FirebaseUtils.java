@@ -1,4 +1,4 @@
-package com.canli.oya.traininventoryfirebase.utils.firebaseutils;
+package com.canli.oya.traininventoryfirebase.utils;
 
 import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.model.Train;
@@ -73,7 +73,7 @@ public final class FirebaseUtils {
 
 
     //////////// REFERENCES FOR FIREBASE STORAGE ///////////////////////////
-    public static StorageReference getTrainPhotosRef() {
+    static StorageReference getTrainPhotosRef() {
         String uid = getCurrentUserId();
         if (uid != null) {
             return FirebaseStorage.getInstance().getReference().child(getCurrentUserId()).child("train_photos" );
@@ -85,7 +85,7 @@ public final class FirebaseUtils {
         return FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
     }
 
-    public static StorageReference getBrandPhotosRef() {
+    static StorageReference getBrandPhotosRef() {
         String uid = getCurrentUserId();
         if (uid != null) {
             return FirebaseStorage.getInstance().getReference().child(getCurrentUserId()).child("brand_logos" );

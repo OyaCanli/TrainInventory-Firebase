@@ -3,8 +3,8 @@ package com.canli.oya.traininventoryfirebase.repositories;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseLiveDataList;
-import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseUtils;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.CategoryListLiveData;
+import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -13,13 +13,13 @@ public class CategoryRepository {
 
     private static CategoryRepository sInstance;
     private static final String TAG = "CategoryRepository";
-    private final FirebaseLiveDataList categoryList;
+    private final CategoryListLiveData categoryList;
     private boolean categoryIsUsed;
     private CategoryUseListener mCallback;
 
     private CategoryRepository(CategoryUseListener listener) {
         Log.d(TAG, "new instance of CategoryRepository");
-        categoryList = new FirebaseLiveDataList(FirebaseUtils.getCategoriesRef(), String.class);
+        categoryList = new CategoryListLiveData(FirebaseUtils.getCategoriesRef());
         mCallback = listener;
     }
 
@@ -32,7 +32,7 @@ public class CategoryRepository {
         return sInstance;
     }
 
-    public FirebaseLiveDataList getCategoryList() {
+    public CategoryListLiveData getCategoryList() {
         return categoryList;
     }
 

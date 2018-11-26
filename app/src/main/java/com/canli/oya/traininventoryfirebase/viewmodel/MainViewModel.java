@@ -5,12 +5,16 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.canli.oya.traininventoryfirebase.model.Brand;
+import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.repositories.BrandRepository;
 import com.canli.oya.traininventoryfirebase.repositories.CategoryRepository;
 import com.canli.oya.traininventoryfirebase.repositories.TrainRepository;
-import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseLiveDataList;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.BrandListLiveData;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.CategoryListLiveData;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.TrainListLiveData;
 
+import java.util.List;
 import java.util.Map;
 
 public class MainViewModel extends ViewModel {
@@ -26,7 +30,7 @@ public class MainViewModel extends ViewModel {
 
     /////////// TRAIN LIST /////////////
 
-    public FirebaseLiveDataList getTrainList() {
+    public TrainListLiveData getTrainList() {
         return mTrainRepo.getAllMinimalTrains();
     }
 
@@ -56,7 +60,7 @@ public class MainViewModel extends ViewModel {
         mBrandRepo = BrandRepository.getInstance(listener);
     }
 
-    public FirebaseLiveDataList getBrandList() {
+    public BrandListLiveData getBrandList() {
         return mBrandRepo.getBrandList();
     }
 
@@ -94,7 +98,7 @@ public class MainViewModel extends ViewModel {
         mCategoryRepo = CategoryRepository.getInstance(listener);
     }
 
-    public FirebaseLiveDataList getCategoryList() {
+    public CategoryListLiveData getCategoryList() {
         return mCategoryRepo.getCategoryList();
     }
 
@@ -111,11 +115,11 @@ public class MainViewModel extends ViewModel {
     }
 
     ///////////// SEARCH //////////////////////////
-    public FirebaseLiveDataList getTrainsFromThisBrand(String brandName){
+    public LiveData<List<MinimalTrain>> getTrainsFromThisBrand(String brandName){
         return mTrainRepo.getTrainsFromThisBrand(brandName);
     }
 
-    public FirebaseLiveDataList getTrainsFromThisCategory(String category){
+    public LiveData<List<MinimalTrain>> getTrainsFromThisCategory(String category){
         return mTrainRepo.getTrainsFromThisCategory(category);
     }
 

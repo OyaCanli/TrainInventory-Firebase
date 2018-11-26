@@ -1,4 +1,4 @@
-package com.canli.oya.traininventoryfirebase.utils.firebaseutils;
+package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
 import android.arch.lifecycle.LiveData;
 import android.util.Log;
@@ -9,17 +9,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-public class FirebaseLiveDataOnce extends LiveData<DataSnapshot> {
-    private static final String LOG_TAG = "FirebaseQueryLiveData";
+public class FetchOnceLiveData extends LiveData<DataSnapshot> {
+    private static final String LOG_TAG = "FetchOnceLiveData";
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
 
-    public FirebaseLiveDataOnce(Query query) {
-        this.query = query;
-    }
-
-    public FirebaseLiveDataOnce(DatabaseReference ref) {
+    public FetchOnceLiveData(DatabaseReference ref) {
         this.query = ref;
     }
 
