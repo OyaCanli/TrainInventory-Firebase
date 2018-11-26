@@ -8,9 +8,9 @@ import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.model.Train;
-import com.canli.oya.traininventoryfirebase.utils.FirebaseLiveDataOnce;
-import com.canli.oya.traininventoryfirebase.utils.FirebaseQueryLiveData;
-import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
+import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseLiveDataList;
+import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseQueryLiveData;
+import com.canli.oya.traininventoryfirebase.utils.firebaseutils.FirebaseUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -25,8 +25,9 @@ public class TrainRepository {
 
     private static TrainRepository sInstance;
     private static final String TAG = "TrainRepository";
-    private LiveData<List<MinimalTrain>> minimalTrains;
+    //private LiveData<List<MinimalTrain>> minimalTrains;
     private String trainPushId;
+    FirebaseLiveDataList minimalTrains;
 
     private TrainRepository() {
         Log.d(TAG, "new instance of TrainRepository");
@@ -42,17 +43,13 @@ public class TrainRepository {
     }
 
     ////////////////// ALL TRAINS //////////////////////////
-    public LiveData<List<MinimalTrain>> getAllMinimalTrains() {
+    public FirebaseLiveDataList getAllMinimalTrains() {
         if(minimalTrains == null || minimalTrains.getValue().isEmpty()){
-            loadAllMinimalTrains();
+            minimalTrains = new FirebaseLiveDataList(FirebaseUtils.getMinimalTrainsRef(), MinimalTrain.class);
         }
         return minimalTrains;
     }
 
-    private void loadAllMinimalTrains() {
-        FirebaseQueryLiveData allTrains = new FirebaseQueryLiveData(FirebaseUtils.getMinimalTrainsRef());
-        minimalTrains = Transformations.map(allTrains, new TrainListDeserializer());
-    }
 
     private class TrainListDeserializer implements Function<DataSnapshot, List<MinimalTrain>> {
         @Override
@@ -172,14 +169,12 @@ public class TrainRepository {
         }
     }
 
-    public LiveData<List<MinimalTrain>> getTrainsFromThisBrand(String brandName) {
-        FirebaseLiveDataOnce livedata = new FirebaseLiveDataOnce(FirebaseUtils.getTrainsInBrandsRef().child(brandName));
-        return Transformations.map(livedata, new TrainListDeserializer());
+    public FirebaseLiveDataList getTrainsFromThisBrand(String brandName) {
+        return new FirebaseLiveDataList(FirebaseUtils.getTrainsInBrandsRef().child(brandName), MinimalTrain.class);
     }
 
-    public LiveData<List<MinimalTrain>> getTrainsFromThisCategory(String category) {
-        FirebaseLiveDataOnce livedata = new FirebaseLiveDataOnce(FirebaseUtils.getTrainsInCategoriesRef().child(category));
-        return Transformations.map(livedata, new TrainListDeserializer());
+    public FirebaseLiveDataList getTrainsFromThisCategory(String category) {
+        return new FirebaseLiveDataList(FirebaseUtils.getTrainsInCategoriesRef().child(category), MinimalTrain.class);
     }
 
     ////////////////////////// SEARCH //////////////////////////////////

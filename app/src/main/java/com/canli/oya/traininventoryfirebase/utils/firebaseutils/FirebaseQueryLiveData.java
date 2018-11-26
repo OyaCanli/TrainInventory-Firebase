@@ -1,4 +1,4 @@
-package com.canli.oya.traininventoryfirebase.utils;
+package com.canli.oya.traininventoryfirebase.utils.firebaseutils;
 
 import android.arch.lifecycle.LiveData;
 import android.util.Log;
@@ -9,24 +9,24 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-public class FirebaseLiveDataOnce extends LiveData<DataSnapshot> {
+public class FirebaseQueryLiveData extends LiveData<DataSnapshot> {
     private static final String LOG_TAG = "FirebaseQueryLiveData";
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
 
-    public FirebaseLiveDataOnce(Query query) {
+    public FirebaseQueryLiveData(Query query) {
         this.query = query;
     }
 
-    public FirebaseLiveDataOnce(DatabaseReference ref) {
+    public FirebaseQueryLiveData(DatabaseReference ref) {
         this.query = ref;
     }
 
     @Override
     protected void onActive() {
         Log.d(LOG_TAG, "onActive");
-        query.addListenerForSingleValueEvent(listener);
+        query.addValueEventListener(listener);
     }
 
     @Override

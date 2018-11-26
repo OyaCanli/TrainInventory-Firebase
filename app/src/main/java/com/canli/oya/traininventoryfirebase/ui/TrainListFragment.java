@@ -36,7 +36,6 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
     private TrainAdapter mAdapter;
     private List<MinimalTrain> mTrainList;
     private FragmentTrainListBinding binding;
-    private MainViewModel mViewModel;
     private static final String TAG = "TrainListFragment";
     private Map<String, String> mSearchLookUp;
 
@@ -64,8 +63,8 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        
+        MainViewModel mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+
         Bundle bundle = getArguments();
         //If the list will be used for showing selected trains
         if (bundle != null && bundle.containsKey(Constants.INTENT_REQUEST_CODE)) {
@@ -74,9 +73,9 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 case Constants.TRAINS_OF_BRAND: {
                     String brandName = bundle.getString(Constants.BRAND_NAME);
                     getActivity().setTitle(getString(R.string.trains_of_the_brand, brandName));
-                    mViewModel.getTrainsFromThisBrand(brandName).observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
+                    mViewModel.getTrainsFromThisBrand(brandName).observe(TrainListFragment.this, new Observer<List>() {
                         @Override
-                        public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
+                        public void onChanged(@Nullable List trainEntries) {
                             if (trainEntries == null || trainEntries.isEmpty()) {
                                 binding.setIsEmpty(true);
                                 binding.setEmptyMessage(getString(R.string.no_train_for_this_brand));
@@ -92,9 +91,9 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 case Constants.TRAINS_OF_CATEGORY: {
                     String categoryName = bundle.getString(Constants.CATEGORY_NAME);
                     getActivity().setTitle(getString(R.string.all_from_this_Category, categoryName));
-                    mViewModel.getTrainsFromThisCategory(categoryName).observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
+                    mViewModel.getTrainsFromThisCategory(categoryName).observe(TrainListFragment.this, new Observer<List>() {
                         @Override
-                        public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
+                        public void onChanged(@Nullable List trainEntries) {
                             if (trainEntries == null || trainEntries.isEmpty()) {
                                 binding.setIsEmpty(true);
                                 binding.setEmptyMessage(getString(R.string.no_items_for_this_category));
@@ -110,9 +109,9 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 default: {
                     //If the list is going to be use for showing all trains, which is the default behaviour
                     getActivity().setTitle(getString(R.string.all_trains));
-                    mViewModel.getTrainList().observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
+                    mViewModel.getTrainList().observe(TrainListFragment.this, new Observer<List>() {
                         @Override
-                        public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
+                        public void onChanged(@Nullable List trainEntries) {
                             if (trainEntries == null || trainEntries.isEmpty()) {
                                 binding.setIsEmpty(true);
                                 binding.setEmptyMessage(getString(R.string.no_trains_found));

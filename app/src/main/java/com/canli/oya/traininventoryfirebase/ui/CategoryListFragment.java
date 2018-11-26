@@ -97,9 +97,9 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     private void setUpOnSignIn() {
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.initializeCategoryRepo(this);
-        mViewModel.getCategoryList().observe(CategoryListFragment.this, new Observer<List<String>>() {
+        mViewModel.getCategoryList().observe(CategoryListFragment.this, new Observer<List>() {
             @Override
-            public void onChanged(@Nullable List<String> categoryEntries) {
+            public void onChanged(@Nullable List categoryEntries) {
                 if (categoryEntries == null || categoryEntries.isEmpty()) {
                     binding.included.setIsEmpty(true);
                     binding.included.setEmptyMessage(getString(R.string.no_categories_found));

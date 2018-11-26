@@ -165,9 +165,9 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         final CustomSpinAdapter brandAdapter = new CustomSpinAdapter(getActivity(), brandList);
         binding.brandSpinner.setAdapter(brandAdapter);
         binding.brandSpinner.setOnItemSelectedListener(this);
-        mViewModel.getBrandList().observe(AddTrainFragment.this, new Observer<List<Brand>>() {
+        mViewModel.getBrandList().observe(AddTrainFragment.this, new Observer<List>() {
             @Override
-            public void onChanged(@Nullable List<Brand> brandEntries) {
+            public void onChanged(@Nullable List brandEntries) {
                 if(brandEntries != null && !brandEntries.isEmpty()){
                     brandList.clear();
                     brandList.addAll(brandEntries);
@@ -184,9 +184,9 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.categorySpinner.setAdapter(categoryAdapter);
         binding.categorySpinner.setOnItemSelectedListener(this);
-        mViewModel.getCategoryList().observe(AddTrainFragment.this, new Observer<List<String>>() {
+        mViewModel.getCategoryList().observe(AddTrainFragment.this, new Observer<List>() {
             @Override
-            public void onChanged(@Nullable List<String> categoryEntries) {
+            public void onChanged(@Nullable List categoryEntries) {
                 if(categoryEntries != null && !categoryEntries.isEmpty()) {
                     categoryList.clear();
                     categoryList.addAll(categoryEntries);
