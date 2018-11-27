@@ -46,7 +46,7 @@ public class TrainRepository {
 
     ////////////////// ALL TRAINS //////////////////////////
     public TrainListLiveData getAllMinimalTrains() {
-        if(minimalTrains == null || minimalTrains.getValue().isEmpty()){
+        if(minimalTrains == null){
             minimalTrains = new TrainListLiveData(FirebaseUtils.getMinimalTrainsRef());
         }
         return minimalTrains;

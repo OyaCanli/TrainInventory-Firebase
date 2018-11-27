@@ -73,6 +73,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     private boolean isEdit;
     private boolean brandsLoaded, categoryLoaded, trainLoaded;
     private boolean imageClicked;
+    ChosenTrainViewModel chosenTrainViewModel;
     private TextWatcher mTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -101,8 +102,8 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onImageUploaded(Uri imageUri, boolean loadingSuccessful) {
         Log.d(TAG, "onImageUploaded called");
-        if(loadingSuccessful){
-            if(isEdit) {
+        if (loadingSuccessful) {
+            if (isEdit) {
                 String previousUrl = mTrainToUpdate.getImageUri();
                 mTrainToUpdate.setImageUri(imageUri.toString());
                 mViewModel.updateTrainImageUrl(mTrainToUpdate);
@@ -140,6 +141,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         binding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_add_train, container, false);
 
+        Log.d(TAG, "onCreateView is called");
         setHasOptionsMenu(true);
 
         //Set click listener on buttons
@@ -156,6 +158,8 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        Log.d(TAG, "onActivityCreated is called");
+
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.initializeBrandRepo(null);
         mViewModel.initializeCategoryRepo(null);
@@ -168,7 +172,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         mViewModel.getBrandList().observe(AddTrainFragment.this, new Observer<List<Brand>>() {
             @Override
             public void onChanged(@Nullable List<Brand> brandEntries) {
-                if(brandEntries != null && !brandEntries.isEmpty()){
+                if (brandEntries != null && !brandEntries.isEmpty()) {
                     brandList.clear();
                     brandList.addAll(brandEntries);
                     brandAdapter.notifyDataSetChanged();
@@ -187,7 +191,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         mViewModel.getCategoryList().observe(AddTrainFragment.this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> categoryEntries) {
-                if(categoryEntries != null && !categoryEntries.isEmpty()) {
+                if (categoryEntries != null && !categoryEntries.isEmpty()) {
                     categoryList.clear();
                     categoryList.addAll(categoryEntries);
                     categoryAdapter.notifyDataSetChanged();
@@ -206,23 +210,24 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
             String trainId = bundle.getString(Constants.TRAIN_ID);
             //This view model is instantiated only in edit mode. It contains the chosen train. It is attached to this fragment
             ChosenTrainFactory factory = InjectorUtils.provideChosenTrainFactory(trainId);
-            final ChosenTrainViewModel viewModel = ViewModelProviders.of(this, factory).get(ChosenTrainViewModel.class);
-            viewModel.getChosenTrain().observe(this, new Observer<Train>() {
+            chosenTrainViewModel = ViewModelProviders.of(this, factory).get(ChosenTrainViewModel.class);
+            chosenTrainViewModel.getChosenTrain().observe(this, new Observer<Train>() {
                 @Override
                 public void onChanged(@Nullable Train train) {
-                    if(train != null){
+                    if (train != null) {
+                        Log.d(TAG, "chosen train loaded");
                         binding.setChosenTrain(train);
                         binding.executePendingBindings();
                         mChosenTrain = train;
                         trainLoaded = true;
                         setSpinners();
-                        if(savedInstanceState != null) {
+                        chosenTrainViewModel.getChosenTrain().removeObserver(this);
+                        if (savedInstanceState != null) {
                             restoreState(savedInstanceState);
                         }
                     }
                 }
             });
-
             setTouchListenersToEditTexts();
         } else { //This is the "add" case
             getActivity().setTitle(getString(R.string.add_train));
@@ -262,7 +267,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         /*Before setting spinners, we should make sure that all these three data are loaded.
         And since their loading order can vary, I call this method ech time one of these
         items are loaded, but it will only work when all three are loaded.*/
-        if(trainLoaded && categoryLoaded && brandsLoaded){
+        if (trainLoaded && categoryLoaded && brandsLoaded) {
             //Set category spinner
             binding.categorySpinner.setSelection(categoryList.indexOf(mChosenTrain.getCategoryName()));
             //Set brand spinner
@@ -358,7 +363,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
             uploadImageTask.execute(getActivity());
         }
 
-        if(!isEdit){
+        if (!isEdit) {
             mTrainToUpdate = new Train(null, trainName, reference, mChosenBrand, mChosenCategory, quantity, null, description, location, scale);
             mViewModel.insertTrain(mTrainToUpdate);
         } else {
@@ -404,6 +409,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
 
             }
         });
+        saveTemporaryState();
         pickImageDialog = builder.create();
         pickImageDialog.show();
     }
@@ -513,6 +519,32 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         outState.putInt(Constants.BRAND_SPINNER_POSITION, binding.brandSpinner.getSelectedItemPosition());
         outState.putInt(Constants.CATEGORY_SPINNER_POSITION, binding.categorySpinner.getSelectedItemPosition());
         outState.putString(Constants.IMAGE_URL, mImageUri);
+    }
+
+    private void saveTemporaryState() {
+        //Verify data
+        String quantityToParse = binding.editQuantity.getText().toString().trim();
+        //Quantity can be null. But if it is not null it should be a positive integer
+        int quantity = 0;
+        if (!TextUtils.isEmpty(quantityToParse)) {
+            try {
+                quantity = Integer.valueOf(quantityToParse);
+            } catch (NumberFormatException nfe) {
+                Log.e(TAG, nfe.getMessage());
+            }
+        }
+        String reference = binding.editReference.getText().toString().trim();
+        String trainName = binding.editTrainName.getText().toString().trim();
+        String description = binding.editTrainDescription.getText().toString().trim();
+        String location = binding.editLocationNumber.getText().toString().trim() + "-" +
+                binding.editLocationLetter.getText().toString().trim();
+        String scale = binding.editScale.getText().toString().trim();
+        String trainID = null;
+        if (mChosenTrain != null) {
+            trainID = mChosenTrain.getTrainId();
+        }
+        Train currentTrain = new Train(trainID, trainName, reference, mChosenBrand, mChosenCategory, quantity, mImageUri, description, location, scale);
+        chosenTrainViewModel.setChosenTrain(currentTrain);
     }
 
     @Override
