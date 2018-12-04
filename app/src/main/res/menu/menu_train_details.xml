@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_baseline_delete"
         android:title="@string/delete"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/sign_out"
+        android:title="@string/sign_out"
+        app:showAsAction="never" />
 </menu>

@@ -13,4 +13,5 @@
     <dimen name="list_brand_logo_dim">60dp</dimen>
     <dimen name="brand_item_logo_dim">32dp</dimen>
     <dimen name="textSize">16sp</dimen>
+    <dimen name="large_margins">32dp</dimen>
 </resources>

@@ -14,6 +14,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,8 +29,7 @@ import com.canli.oya.traininventoryfirebase.databinding.FragmentListBinding;
 import com.canli.oya.traininventoryfirebase.repositories.CategoryRepository;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.firebase.ui.auth.AuthUI;
 
 import java.util.List;
 
@@ -42,32 +42,10 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     private MainViewModel mViewModel;
     private CoordinatorLayout coordinator;
     private String categoryToErase;
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-        @Override
-        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-            if (user != null) {
-                setUpOnSignIn();
-            }
-        }
-    };
+    private static final String TAG = "CategoryListFragment";
 
     public CategoryListFragment() {
         setRetainInstance(true);
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
     }
 
     @Nullable
@@ -91,10 +69,8 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getActivity().setTitle(getString(R.string.all_categories));
+        Log.d(TAG, "onActivityCreated is called");
         coordinator = getActivity().findViewById(R.id.coordinator);
-    }
-
-    private void setUpOnSignIn() {
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.initializeCategoryRepo(this);
         mViewModel.getCategoryList().observe(CategoryListFragment.this, new Observer<List<String>>() {
@@ -139,8 +115,11 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_add) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_add) {
             openAddCategoryFragment();
+        } else if (itemId == R.id.sign_out) {
+            AuthUI.getInstance().signOut(getActivity());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -189,6 +168,7 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
                     public void onClick(View view) {
                         //If UNDO is clicked, add the item back in the database
                         mViewModel.insertCategory(categoryToErase);
+                        mAdapter.notifyDataSetChanged();
                     }
                 });
         snackbar.show();

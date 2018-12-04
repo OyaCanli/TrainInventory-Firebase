@@ -26,6 +26,7 @@ import com.canli.oya.traininventoryfirebase.databinding.FragmentTrainListBinding
 import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
+import com.firebase.ui.auth.AuthUI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,8 +186,11 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_add) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_add) {
             openAddTrainFragment();
+        } else if (itemId == R.id.sign_out) {
+            AuthUI.getInstance().signOut(getActivity());
         }
         return super.onOptionsItemSelected(item);
     }

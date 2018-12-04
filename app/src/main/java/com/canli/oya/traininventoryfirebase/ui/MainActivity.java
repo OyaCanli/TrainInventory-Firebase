@@ -7,7 +7,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,16 +17,12 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.databinding.ActivityMainBinding;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
-import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Arrays;
 
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
@@ -39,24 +34,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private TrainListFragment mTrainListFragment;
     private BrandListFragment mBrandListFragment;
     private CategoryListFragment mCategoryListFragment;
-    private FirebaseAuth mFirebaseAuth;
     private static final String TAG = "MainActivity";
     public static final int RC_SIGN_IN = 1;
+    private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
         @Override
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
             FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user == null) {
-                Log.d(TAG, "user null, starting sign in screen");
-                startActivityForResult(
-                        AuthUI.getInstance()
-                                .createSignInIntentBuilder()
-                                .setIsSmartLockEnabled(false)
-                                .setAvailableProviders(Arrays.asList(
-                                        new AuthUI.IdpConfig.EmailBuilder().build(),
-                                        new AuthUI.IdpConfig.GoogleBuilder().build()))
-                                .build(),
-                        RC_SIGN_IN);
+                Log.d(TAG, "user logged out");
+                //Go to splash activity
+                startActivity(new Intent(MainActivity.this, SplashActivity.class));
+                finish();
+            } else {
+                Log.d(TAG, "user logged in");
             }
         }
     };
@@ -67,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
-       mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
 
         //Set toolbar
         setSupportActionBar(binding.toolbar);
@@ -76,28 +67,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         fm = getSupportFragmentManager();
 
-        if(savedInstanceState == null){
-            fm.beginTransaction()
-                    .setCustomAnimations(0, android.R.animator.fade_out)
-                    .add(R.id.container, getCategoryListFragment())
-                    .commit();
-        }
-    }
-
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume is called");
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        fm.beginTransaction()
+                .setCustomAnimations(0, android.R.animator.fade_out)
+                .add(R.id.container, getCategoryListFragment())
+                .commit();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
-    }*/
+    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -222,24 +204,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         hideOrShowBottomNavigation(currentFrag);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult is called");
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) {
-                Log.d(TAG, "result ok");
-                // Sign-in succeeded, set up the UI
-                Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
-            } else if (resultCode == RESULT_CANCELED) {
-                Log.d(TAG, "result cancelled");
-                // Sign in was canceled by the user, finish the activity
-                Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
-
     public TrainListFragment getTrainListFragment() {
         if (mTrainListFragment == null) {
             mTrainListFragment = new TrainListFragment();
@@ -265,11 +229,5 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         outState.putBoolean(Constants.UNSAVED_CHANGES, thereAreUnsavedChanges);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
     }
 }

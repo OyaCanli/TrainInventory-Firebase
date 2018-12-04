@@ -45,6 +45,7 @@ import com.canli.oya.traininventoryfirebase.utils.UploadImageAsyncTask;
 import com.canli.oya.traininventoryfirebase.viewmodel.ChosenTrainFactory;
 import com.canli.oya.traininventoryfirebase.viewmodel.ChosenTrainViewModel;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
+import com.firebase.ui.auth.AuthUI;
 
 import java.io.File;
 import java.io.IOException;
@@ -306,11 +307,19 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_save) {
-            saveTrain();
-        } else if (id == android.R.id.home) {
-            getActivity().onBackPressed();
+        switch (item.getItemId()) {
+            case R.id.action_save: {
+                saveTrain();
+                break;
+            }
+            case android.R.id.home: {
+                getActivity().onBackPressed();
+                break;
+            }
+            case R.id.sign_out: {
+                AuthUI.getInstance().signOut(getActivity());
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

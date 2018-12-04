@@ -72,4 +72,7 @@
     <string name="warning_brand_used">This brand is used by some trains. You cannot erase it.</string>
     <string name="no_results">No results found</string>
     <string name="error_during_image_loading">There was an error during image upload</string>
+    <string name="sign_out">Sign out</string>
+    <string name="sign_in">Sign in >></string>
+    <string name="cd_app_logo">App logo</string>
 </resources>

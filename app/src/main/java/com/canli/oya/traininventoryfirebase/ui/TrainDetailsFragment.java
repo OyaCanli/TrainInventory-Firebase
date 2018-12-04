@@ -19,13 +19,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.databinding.FragmentTrainDetailsBinding;
+import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.canli.oya.traininventoryfirebase.utils.InjectorUtils;
 import com.canli.oya.traininventoryfirebase.viewmodel.ChosenTrainFactory;
 import com.canli.oya.traininventoryfirebase.viewmodel.ChosenTrainViewModel;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
+import com.firebase.ui.auth.AuthUI;
 
 public class TrainDetailsFragment extends Fragment {
 
@@ -101,6 +102,10 @@ public class TrainDetailsFragment extends Fragment {
                         .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                         .addToBackStack(null)
                         .commit();
+                break;
+            }
+            case R.id.sign_out: {
+                AuthUI.getInstance().signOut(getActivity());
                 break;
             }
         }
