@@ -86,7 +86,9 @@ public class SplashActivity extends AppCompatActivity {
                             public void onClick(View view) {
                                 startSignUpActivity();
                             }
-                        });
+                        })
+                        .setActionTextColor(getResources().getColor(R.color.window_background));
+                snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 snackbar.show();
             }
         }
