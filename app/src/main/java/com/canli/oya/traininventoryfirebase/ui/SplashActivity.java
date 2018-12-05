@@ -5,9 +5,12 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
@@ -23,6 +26,7 @@ public class SplashActivity extends AppCompatActivity {
     public static final int RC_SIGN_IN = 1;
     private static final String TAG = "SplashActivity";
     private FirebaseAuth mFirebaseAuth;
+    private ActivitySplashBinding binding;
     private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
         @Override
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -42,15 +46,16 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivitySplashBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-        binding.signInBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSignUpActivity();
-            }
-        });
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.translate_from_left);
+        binding.splashLogo.startAnimation(animation);
     }
 
     @Override
@@ -74,8 +79,15 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             } else if (resultCode == RESULT_CANCELED) {
                 Log.d(TAG, "result cancelled");
-                // Sign in was canceled by the user, finish the activity
-                Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
+                Snackbar snackbar = Snackbar
+                        .make(binding.getRoot(), "You need to sign-in in order to use the app", Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.sign_in, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                startSignUpActivity();
+                            }
+                        });
+                snackbar.show();
             }
         }
     }

@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private BrandListFragment mBrandListFragment;
     private CategoryListFragment mCategoryListFragment;
     private static final String TAG = "MainActivity";
-    public static final int RC_SIGN_IN = 1;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
         @Override
