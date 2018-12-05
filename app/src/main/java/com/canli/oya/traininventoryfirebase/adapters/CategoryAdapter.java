@@ -40,6 +40,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     public void onBindViewHolder(@NonNull CategoryHolder holder, int position) {
         String currentCategory = mCategoryList.get(position);
         holder.binding.setVariable(BR.categoryName, currentCategory);
+        holder.binding.setCategoryNumber(position + 1);
         holder.binding.executePendingBindings();
     }
 

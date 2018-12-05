@@ -20,7 +20,7 @@
             android:layout_marginTop="16dp"
             android:ems="10"
             android:hint="@string/category_name"
-            android:inputType="textPersonName"
+            android:inputType="textCapWords"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/addCategory_saveBtn"
             app:layout_constraintStart_toStartOf="parent"

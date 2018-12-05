@@ -1,6 +1,5 @@
 package com.canli.oya.traininventoryfirebase.adapters;
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.databinding.BrandItemBinding;
+import com.canli.oya.traininventoryfirebase.model.Brand;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class BrandAdapter extends RecyclerView.Adapter<BrandAdapter.BrandViewHol
     private List<Brand> mBrandList;
     private final BrandItemClickListener mClickListener;
 
-    public BrandAdapter(Context context, BrandItemClickListener listener){
+    public BrandAdapter(BrandItemClickListener listener) {
         mClickListener = listener;
     }
 
@@ -42,6 +41,7 @@ public class BrandAdapter extends RecyclerView.Adapter<BrandAdapter.BrandViewHol
     public void onBindViewHolder(@NonNull BrandViewHolder holder, int position) {
         Brand currentBrand = mBrandList.get(position);
         holder.binding.setBrand(currentBrand);
+        holder.binding.setBrandNumber(position + 1);
         holder.binding.executePendingBindings();
     }
 

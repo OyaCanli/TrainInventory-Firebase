@@ -12,6 +12,10 @@
             name="trainItemClick"
             type="com.canli.oya.traininventoryfirebase.adapters.TrainAdapter.TrainItemClickListener" />
 
+        <variable
+            name="trainNumber"
+            type="int" />
+
         <import type="com.canli.oya.traininventoryfirebase.utils.DataBindingUtils" />
     </data>
 
@@ -30,64 +34,71 @@
             android:id="@+id/train_item_train_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/half_margin"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="@dimen/half_margin"
+            android:layout_marginLeft="8dp"
+            android:text="@{train.trainName}"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/product_item_image"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Train name"
-            android:text="@{train.trainName}"/>
+            app:layout_constraintBaseline_toBaselineOf="@+id/train_number"
+            app:layout_constraintStart_toEndOf="@+id/train_number"
+            tools:text="Train name" />
 
         <TextView
             android:id="@+id/train_item_brand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/half_margin"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            app:layout_constraintStart_toEndOf="@+id/product_item_image"
+            android:text="@{train.brandName}"
+            app:layout_constraintStart_toStartOf="@+id/train_item_train_name"
             app:layout_constraintTop_toBottomOf="@+id/train_item_train_name"
-            tools:text="Brand name"
-            android:text="@{train.brandName}"/>
+            tools:text="Brand name" />
 
         <ImageView
-            android:id="@+id/product_item_image"
+            android:id="@+id/train_item_image"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="@dimen/margin_standard"
-            android:layout_marginStart="@dimen/half_margin"
             android:layout_marginTop="@dimen/half_margin"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="@string/cd_product_image"
             android:src="@{train.imageUri}"
-            android:contentDescription="@string/cd_product_image"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/train_item_reference"
             android:layout_width="wrap_content"
             android:layout_height="15dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            app:layout_constraintStart_toEndOf="@+id/product_item_image"
+            android:text="@{train.modelReference}"
+            app:layout_constraintStart_toStartOf="@+id/train_item_brand"
             app:layout_constraintTop_toBottomOf="@+id/train_item_brand"
-            tools:text="reference"
-            android:text="@{train.modelReference}"/>
+            tools:text="reference" />
 
         <TextView
             android:id="@+id/train_item_category"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@{DataBindingUtils.encloseInParanthesis(train.categoryName)}"
             android:textStyle="italic"
             app:layout_constraintBaseline_toBaselineOf="@+id/train_item_train_name"
             app:layout_constraintStart_toEndOf="@+id/train_item_train_name"
-            tools:text="(Vagon)"
-            android:text="@{DataBindingUtils.encloseInParanthesis(train.categoryName)}"/>
+            tools:text="(Vagon)" />
+
+        <TextView
+            android:id="@+id/train_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@{DataBindingUtils.addPoint(trainNumber)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="1." />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

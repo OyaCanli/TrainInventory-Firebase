@@ -58,7 +58,7 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
 
         setHasOptionsMenu(true);
 
-        adapter = new BrandAdapter(getActivity(), this);
+        adapter = new BrandAdapter(this);
         binding.included.list.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.included.list.setItemAnimator(new DefaultItemAnimator());
         binding.included.list.setAdapter(adapter);
@@ -216,7 +216,9 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
                     public void onClick(View view) {
                         mViewModel.insertBrand(brandToErase);
                     }
-                });
+                })
+                .setActionTextColor(getResources().getColor(R.color.window_background));
+        snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         snackbar.show();
     }
 }

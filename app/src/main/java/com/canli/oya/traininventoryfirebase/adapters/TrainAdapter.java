@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.canli.oya.traininventoryfirebase.R;
-import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.databinding.TrainItemBinding;
+import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 
 import java.util.List;
 
@@ -35,6 +35,7 @@ public class TrainAdapter extends RecyclerView.Adapter<TrainAdapter.TrainViewHol
     public void onBindViewHolder(@NonNull TrainViewHolder holder, int position) {
         MinimalTrain currentTrain = mTrainList.get(position);
         holder.binding.setTrain(currentTrain);
+        holder.binding.setTrainNumber(position + 1);
         holder.binding.executePendingBindings();
     }
 

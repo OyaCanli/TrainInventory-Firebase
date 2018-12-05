@@ -170,7 +170,9 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
                         mViewModel.insertCategory(categoryToErase);
                         mAdapter.notifyDataSetChanged();
                     }
-                });
+                })
+                .setActionTextColor(getResources().getColor(R.color.window_background));
+        snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         snackbar.show();
     }
 }

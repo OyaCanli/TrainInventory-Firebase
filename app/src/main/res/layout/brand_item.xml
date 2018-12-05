@@ -10,6 +10,12 @@
         <variable
             name="brandItemClick"
             type="com.canli.oya.traininventoryfirebase.adapters.BrandAdapter.BrandItemClickListener" />
+
+        <variable
+            name="brandNumber"
+            type="int" />
+
+        <import type="com.canli.oya.traininventoryfirebase.utils.DataBindingUtils" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -26,19 +32,18 @@
             android:id="@+id/brand_item_brandName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="@dimen/margin_standard"
-            android:layout_marginRight="@dimen/margin_standard"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="@dimen/half_margin"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="@dimen/margin_standard"
             android:gravity="center_vertical"
+            android:text="@{brand.brandName}"
             android:textSize="@dimen/textSize"
-            android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/brand_item_logo"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView14"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Brand Name"
-            android:text = "@{brand.brandName}"/>
+            tools:text="Brand Name" />
 
         <ImageView
             android:id="@+id/brand_item_logo"
@@ -64,7 +69,7 @@
             android:layout_marginTop="8dp"
             android:padding="4dp"
             android:contentDescription="@string/cd_web_icon_fror_brands"
-            android:src="@drawable/link_symbol"
+            app:srcCompat="@drawable/link_symbol"
             android:onClick="@{(theView) ->  brandItemClick.onBrandItemClicked(theView, brand)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/brand_item_train_icon"
@@ -81,7 +86,7 @@
             app:layout_constraintStart_toEndOf="@+id/brand_item_web_icon"
             app:layout_constraintTop_toTopOf="@+id/brand_item_web_icon"
             android:contentDescription="@string/cd_train_icon_for_brands"
-            android:src="@drawable/ic_train_list_item"
+            app:srcCompat="@drawable/ic_train_list_item"
             android:onClick="@{(theView) ->  brandItemClick.onBrandItemClicked(theView, brand)}"
             />
 
@@ -94,7 +99,19 @@
             app:layout_constraintStart_toEndOf="@+id/brand_item_train_icon"
             app:layout_constraintTop_toTopOf="@+id/brand_item_train_icon"
             android:contentDescription="@string/cd_edit_icon"
-            android:src="@drawable/ic_edit_colored"
+            app:srcCompat="@drawable/ic_edit_colored"
             android:onClick="@{(theView) ->  brandItemClick.onBrandItemClicked(theView, brand)}" />
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@{DataBindingUtils.addPoint(brandNumber)}"
+            android:textSize="16sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/brand_item_brandName"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="1." />
     </android.support.constraint.ConstraintLayout>
 </layout>

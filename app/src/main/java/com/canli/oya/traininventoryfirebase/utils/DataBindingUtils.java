@@ -11,4 +11,8 @@ public final class DataBindingUtils {
     public static String encloseInParanthesis(String category){
         return "(" + category + ")";
     }
+
+    public static String addPoint(int number) {
+        return number + ".";
+    }
 }
