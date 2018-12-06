@@ -81,9 +81,6 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener, 
         binding.addBrandSaveBtn.setOnClickListener(this);
         binding.addBrandImage.setOnClickListener(this);
 
-        //Request focus on the first edit text
-        binding.addBrandEditBrandName.requestFocus();
-
         return binding.getRoot();
     }
 
@@ -104,6 +101,15 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener, 
                 }
             });
         }
+
+        if (!isEdit) {
+            //Request focus on the first edit text
+            binding.addBrandEditBrandName.requestFocus();
+        } else {
+            //Request focus on the web edit text(brand name edittext will be disabled in edit mode)
+            binding.addBrandEditWeb.requestFocus();
+        }
+
     }
 
     private void populateFields(Brand brand) {
