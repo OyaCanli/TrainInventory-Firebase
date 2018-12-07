@@ -66,10 +66,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         fm = getSupportFragmentManager();
 
-        fm.beginTransaction()
-                .setCustomAnimations(0, android.R.animator.fade_out)
-                .add(R.id.container, getCategoryListFragment())
-                .commit();
+        if (savedInstanceState == null) {
+            fm.beginTransaction()
+                    .setCustomAnimations(0, android.R.animator.fade_out)
+                    .add(R.id.container, getCategoryListFragment())
+                    .commit();
+        }
     }
 
     @Override

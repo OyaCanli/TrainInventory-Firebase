@@ -1,6 +1,7 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
 import android.arch.lifecycle.LiveData;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -20,6 +21,16 @@ public class CategoryListLiveData extends LiveData<List<String>> {
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
     private List<String> categoryList;
+    private final Handler handler = new Handler();
+    private boolean pendingListenerRemoval;
+    private final Runnable removeListener = new Runnable() {
+        @Override
+        public void run() {
+            query.removeEventListener(listener);
+            if (categoryList != null) categoryList.clear();
+            pendingListenerRemoval = false;
+        }
+    };
 
     public CategoryListLiveData(DatabaseReference ref) {
         this.query = ref;
@@ -28,14 +39,19 @@ public class CategoryListLiveData extends LiveData<List<String>> {
     @Override
     protected void onActive() {
         Log.d(LOG_TAG, "onActive");
-        query.addChildEventListener(listener);
+        if (pendingListenerRemoval) {
+            handler.removeCallbacks(removeListener);
+        } else {
+            query.addChildEventListener(listener);
+        }
+        pendingListenerRemoval = false;
     }
 
     @Override
     protected void onInactive() {
         Log.d(LOG_TAG, "onInactive");
-        query.removeEventListener(listener);
-        if (categoryList != null) categoryList.clear();
+        handler.postDelayed(removeListener, 2000);
+        pendingListenerRemoval = true;
     }
 
     private class MyValueEventListener implements ChildEventListener {
