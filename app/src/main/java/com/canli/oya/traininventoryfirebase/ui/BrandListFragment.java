@@ -45,6 +45,7 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
     private FragmentListBinding binding;
     private Brand brandToErase;
     private CoordinatorLayout coordinator;
+    private static final String TAG = "BrandListFragment";
 
     public BrandListFragment() {
         setRetainInstance(true);
@@ -62,7 +63,10 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
         binding.included.list.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.included.list.setItemAnimator(new DefaultItemAnimator());
         binding.included.list.setAdapter(adapter);
-        binding.included.setIsLoading(true);
+        Log.d(TAG, "onCreateView called");
+        /*binding.included.setIsLoading(true);
+        binding.included.setIsEmpty(false);
+        binding.executePendingBindings();*/
 
         return binding.getRoot();
     }
@@ -73,19 +77,24 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.initializeBrandRepo(this);
-        mViewModel.getBrandList().observe(BrandListFragment.this, new Observer<List<Brand>>() {
+        mViewModel.getBrandList().observe(getActivity(), new Observer<List<Brand>>() {
             @Override
             public void onChanged(@Nullable List<Brand> brandEntries) {
                 if (brandEntries != null) {
+                    Log.d(TAG, "onChange is called,data is not null");
                     binding.included.setIsLoading(false);
                     if (brandEntries.isEmpty()) {
+                        Log.d(TAG, "onChange is called, list is empty");
                         binding.included.setIsEmpty(true);
                         binding.included.setEmptyMessage(getString(R.string.no_brands_found));
                     } else {
+                        Log.d(TAG, "onChange is called, list is not empty");
                         adapter.setBrands(brandEntries);
                         brands = brandEntries;
                         binding.included.setIsEmpty(false);
                     }
+                } else {
+                    Log.d(TAG, "onChange is called but data is null");
                 }
             }
         });

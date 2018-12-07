@@ -75,19 +75,24 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 case Constants.TRAINS_OF_BRAND: {
                     String brandName = bundle.getString(Constants.BRAND_NAME);
                     getActivity().setTitle(getString(R.string.trains_of_the_brand, brandName));
-                    mViewModel.getTrainsFromThisBrand(brandName).observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
+                    mViewModel.getTrainsFromThisBrand(brandName).observe(getActivity(), new Observer<List<MinimalTrain>>() {
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries != null) {
+                                Log.d(TAG, "onChange is called,data is not null");
                                 binding.setIsLoading(false);
                                 if (trainEntries.isEmpty()) {
+                                    Log.d(TAG, "onChange is called, list is empty");
                                     binding.setIsEmpty(true);
                                     binding.setEmptyMessage(getString(R.string.no_train_for_this_brand));
                                 } else {
+                                    Log.d(TAG, "onChange is called, list is not empty");
                                     binding.setIsEmpty(false);
                                     mAdapter.setTrains(trainEntries);
                                     mTrainList = trainEntries;
                                 }
+                            } else {
+                                Log.d(TAG, "onChange is called but data is null");
                             }
                         }
                     });
@@ -96,7 +101,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 case Constants.TRAINS_OF_CATEGORY: {
                     String categoryName = bundle.getString(Constants.CATEGORY_NAME);
                     getActivity().setTitle(getString(R.string.all_from_this_Category, categoryName));
-                    mViewModel.getTrainsFromThisCategory(categoryName).observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
+                    mViewModel.getTrainsFromThisCategory(categoryName).observe(getActivity(), new Observer<List<MinimalTrain>>() {
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries != null) {
@@ -117,12 +122,12 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 default: {
                     //If the list is going to be use for showing all trains, which is the default behaviour
                     getActivity().setTitle(getString(R.string.all_trains));
-                    mViewModel.getTrainList().observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
+                    mViewModel.getTrainList().observe(getActivity(), new Observer<List<MinimalTrain>>() {
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries != null) {
                                 binding.setIsLoading(false);
-                                if (trainEntries == null || trainEntries.isEmpty()) {
+                                if (trainEntries.isEmpty()) {
                                     binding.setIsEmpty(true);
                                     binding.setEmptyMessage(getString(R.string.no_trains_found));
                                 } else {
@@ -136,7 +141,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 }
             }
         }
-        mViewModel.loadSearchLookUp().observe(this, new Observer<Map<String, String>>() {
+        mViewModel.loadSearchLookUp().observe(getActivity(), new Observer<Map<String, String>>() {
             @Override
             public void onChanged(@Nullable Map<String, String> searchMap) {
                 mSearchLookUp = searchMap;

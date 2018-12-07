@@ -73,19 +73,24 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
         coordinator = getActivity().findViewById(R.id.coordinator);
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.initializeCategoryRepo(this);
-        mViewModel.getCategoryList().observe(CategoryListFragment.this, new Observer<List<String>>() {
+        mViewModel.getCategoryList().observe(getActivity(), new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> categoryEntries) {
                 if (categoryEntries != null) {
+                    Log.d(TAG, "onChange is called,data is not null");
                     binding.included.setIsLoading(false);
                     if (categoryEntries.isEmpty()) {
+                        Log.d(TAG, "onChange is called, list is empty");
                         binding.included.setIsEmpty(true);
                         binding.included.setEmptyMessage(getString(R.string.no_categories_found));
                     } else {
+                        Log.d(TAG, "onChange is called, list is not empty");
                         mAdapter.setCategories(categoryEntries);
                         mCategories = categoryEntries;
                         binding.included.setIsEmpty(false);
                     }
+                } else {
+                    Log.d(TAG, "onChange is called but data is null");
                 }
             }
         });
