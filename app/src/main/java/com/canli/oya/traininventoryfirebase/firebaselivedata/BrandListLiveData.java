@@ -20,7 +20,7 @@ public class BrandListLiveData extends LiveData<List<Brand>> {
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
-    private List<Brand> brandList = new ArrayList<>();
+    private List<Brand> brandList;
 
     public BrandListLiveData(DatabaseReference ref) {
         this.query = ref;
@@ -36,13 +36,14 @@ public class BrandListLiveData extends LiveData<List<Brand>> {
     protected void onInactive() {
         Log.d(LOG_TAG, "onInactive");
         query.removeEventListener(listener);
-        brandList.clear();
+        if (brandList != null) brandList.clear();
     }
 
     private class MyValueEventListener implements ChildEventListener {
 
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            if (brandList == null) brandList = new ArrayList<>();
             brandList.add(dataSnapshot.getValue(Brand.class));
             setValue(brandList);
             Log.d(LOG_TAG, "onChildAdded. list size: " + brandList.size());

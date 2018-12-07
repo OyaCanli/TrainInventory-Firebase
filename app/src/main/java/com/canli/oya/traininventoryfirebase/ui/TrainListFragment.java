@@ -56,6 +56,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
         binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.list.setItemAnimator(new DefaultItemAnimator());
         binding.list.setAdapter(mAdapter);
+        binding.setIsLoading(true);
 
         return binding.getRoot();
     }
@@ -77,13 +78,16 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                     mViewModel.getTrainsFromThisBrand(brandName).observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
-                            if (trainEntries == null || trainEntries.isEmpty()) {
-                                binding.setIsEmpty(true);
-                                binding.setEmptyMessage(getString(R.string.no_train_for_this_brand));
-                            } else {
-                                binding.setIsEmpty(false);
-                                mAdapter.setTrains(trainEntries);
-                                mTrainList = trainEntries;
+                            if (trainEntries != null) {
+                                binding.setIsLoading(false);
+                                if (trainEntries.isEmpty()) {
+                                    binding.setIsEmpty(true);
+                                    binding.setEmptyMessage(getString(R.string.no_train_for_this_brand));
+                                } else {
+                                    binding.setIsEmpty(false);
+                                    mAdapter.setTrains(trainEntries);
+                                    mTrainList = trainEntries;
+                                }
                             }
                         }
                     });
@@ -95,13 +99,16 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                     mViewModel.getTrainsFromThisCategory(categoryName).observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
-                            if (trainEntries == null || trainEntries.isEmpty()) {
-                                binding.setIsEmpty(true);
-                                binding.setEmptyMessage(getString(R.string.no_items_for_this_category));
-                            } else {
-                                binding.setIsEmpty(false);
-                                mAdapter.setTrains(trainEntries);
-                                mTrainList = trainEntries;
+                            if (trainEntries != null) {
+                                binding.setIsLoading(false);
+                                if (trainEntries.isEmpty()) {
+                                    binding.setIsEmpty(true);
+                                    binding.setEmptyMessage(getString(R.string.no_items_for_this_category));
+                                } else {
+                                    binding.setIsEmpty(false);
+                                    mAdapter.setTrains(trainEntries);
+                                    mTrainList = trainEntries;
+                                }
                             }
                         }
                     });
@@ -113,13 +120,16 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                     mViewModel.getTrainList().observe(TrainListFragment.this, new Observer<List<MinimalTrain>>() {
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
-                            if (trainEntries == null || trainEntries.isEmpty()) {
-                                binding.setIsEmpty(true);
-                                binding.setEmptyMessage(getString(R.string.no_trains_found));
-                            } else {
-                                binding.setIsEmpty(false);
-                                mAdapter.setTrains(trainEntries);
-                                mTrainList = trainEntries;
+                            if (trainEntries != null) {
+                                binding.setIsLoading(false);
+                                if (trainEntries == null || trainEntries.isEmpty()) {
+                                    binding.setIsEmpty(true);
+                                    binding.setEmptyMessage(getString(R.string.no_trains_found));
+                                } else {
+                                    binding.setIsEmpty(false);
+                                    mAdapter.setTrains(trainEntries);
+                                    mTrainList = trainEntries;
+                                }
                             }
                         }
                     });

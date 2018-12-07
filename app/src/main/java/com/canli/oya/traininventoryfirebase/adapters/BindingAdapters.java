@@ -1,6 +1,7 @@
 package com.canli.oya.traininventoryfirebase.adapters;
 
 import android.databinding.BindingAdapter;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.canli.oya.traininventoryfirebase.R;
@@ -15,5 +16,10 @@ public class BindingAdapters {
                 .centerCrop()
                 .placeholder(R.drawable.ic_gallery)
                 .into(view);
+    }
+
+    @BindingAdapter("visibleGone")
+    public static void showHide(View view, boolean show) {
+        view.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 }

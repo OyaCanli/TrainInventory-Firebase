@@ -19,7 +19,7 @@ public class CategoryListLiveData extends LiveData<List<String>> {
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
-    private List<String> categoryList = new ArrayList<>();
+    private List<String> categoryList;
 
     public CategoryListLiveData(DatabaseReference ref) {
         this.query = ref;
@@ -35,13 +35,14 @@ public class CategoryListLiveData extends LiveData<List<String>> {
     protected void onInactive() {
         Log.d(LOG_TAG, "onInactive");
         query.removeEventListener(listener);
-        categoryList.clear();
+        if (categoryList != null) categoryList.clear();
     }
 
     private class MyValueEventListener implements ChildEventListener {
 
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            if (categoryList == null) categoryList = new ArrayList<>();
             categoryList.add(dataSnapshot.getValue(String.class));
             setValue(categoryList);
             Log.d(LOG_TAG, "onChildAdded. list size: " + categoryList.size());

@@ -62,6 +62,7 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
         binding.included.list.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.included.list.setItemAnimator(new DefaultItemAnimator());
         binding.included.list.setAdapter(adapter);
+        binding.included.setIsLoading(true);
 
         return binding.getRoot();
     }
@@ -75,13 +76,16 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
         mViewModel.getBrandList().observe(BrandListFragment.this, new Observer<List<Brand>>() {
             @Override
             public void onChanged(@Nullable List<Brand> brandEntries) {
-                if (brandEntries == null || brandEntries.isEmpty()) {
-                    binding.included.setIsEmpty(true);
-                    binding.included.setEmptyMessage(getString(R.string.no_brands_found));
-                } else {
-                    adapter.setBrands(brandEntries);
-                    brands = brandEntries;
-                    binding.included.setIsEmpty(false);
+                if (brandEntries != null) {
+                    binding.included.setIsLoading(false);
+                    if (brandEntries.isEmpty()) {
+                        binding.included.setIsEmpty(true);
+                        binding.included.setEmptyMessage(getString(R.string.no_brands_found));
+                    } else {
+                        adapter.setBrands(brandEntries);
+                        brands = brandEntries;
+                        binding.included.setIsEmpty(false);
+                    }
                 }
             }
         });

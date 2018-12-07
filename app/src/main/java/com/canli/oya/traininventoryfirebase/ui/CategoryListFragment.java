@@ -61,7 +61,7 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
         binding.included.list.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.included.list.setItemAnimator(new DefaultItemAnimator());
         binding.included.list.setAdapter(mAdapter);
-
+        binding.included.setIsLoading(true);
         return binding.getRoot();
     }
 
@@ -76,13 +76,16 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
         mViewModel.getCategoryList().observe(CategoryListFragment.this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> categoryEntries) {
-                if (categoryEntries == null || categoryEntries.isEmpty()) {
-                    binding.included.setIsEmpty(true);
-                    binding.included.setEmptyMessage(getString(R.string.no_categories_found));
-                } else {
-                    mAdapter.setCategories(categoryEntries);
-                    mCategories = categoryEntries;
-                    binding.included.setIsEmpty(false);
+                if (categoryEntries != null) {
+                    binding.included.setIsLoading(false);
+                    if (categoryEntries.isEmpty()) {
+                        binding.included.setIsEmpty(true);
+                        binding.included.setEmptyMessage(getString(R.string.no_categories_found));
+                    } else {
+                        mAdapter.setCategories(categoryEntries);
+                        mCategories = categoryEntries;
+                        binding.included.setIsEmpty(false);
+                    }
                 }
             }
         });

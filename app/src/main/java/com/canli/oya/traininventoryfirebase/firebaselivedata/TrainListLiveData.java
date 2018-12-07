@@ -20,7 +20,7 @@ public class TrainListLiveData extends LiveData<List<MinimalTrain>> {
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
-    private List<MinimalTrain> trainList = new ArrayList<>();
+    private List<MinimalTrain> trainList;
 
     public TrainListLiveData(DatabaseReference ref) {
         this.query = ref;
@@ -36,13 +36,14 @@ public class TrainListLiveData extends LiveData<List<MinimalTrain>> {
     protected void onInactive() {
         Log.d(LOG_TAG, "onInactive");
         query.removeEventListener(listener);
-        trainList.clear();
+        if (trainList != null) trainList.clear();
     }
 
     private class MyValueEventListener implements ChildEventListener {
 
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            if (trainList == null) trainList = new ArrayList<>();
             trainList.add(dataSnapshot.getValue(MinimalTrain.class));
             setValue(trainList);
             Log.d(LOG_TAG, "onChildAdded. list size: " + trainList.size());
