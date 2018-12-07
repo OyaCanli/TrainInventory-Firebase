@@ -1,6 +1,5 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
-import android.arch.lifecycle.LiveData;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -9,7 +8,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-public class FetchOnceLiveData extends LiveData<DataSnapshot> {
+public class FetchOnceLiveData extends FirebaseBaseLiveData<DataSnapshot> {
     private static final String LOG_TAG = "FetchOnceLiveData";
 
     private final Query query;
@@ -20,15 +19,13 @@ public class FetchOnceLiveData extends LiveData<DataSnapshot> {
     }
 
     @Override
-    protected void onActive() {
-        Log.d(LOG_TAG, "onActive");
-        query.addListenerForSingleValueEvent(listener);
+    void removePendingListener() {
+        query.removeEventListener(listener);
     }
 
     @Override
-    protected void onInactive() {
-        Log.d(LOG_TAG, "onInactive");
-        query.removeEventListener(listener);
+    void attachListener() {
+        query.addListenerForSingleValueEvent(listener);
     }
 
     private class MyValueEventListener implements ValueEventListener {

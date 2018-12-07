@@ -64,9 +64,8 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
         binding.included.list.setItemAnimator(new DefaultItemAnimator());
         binding.included.list.setAdapter(adapter);
         Log.d(TAG, "onCreateView called");
-        /*binding.included.setIsLoading(true);
+        binding.included.setIsLoading(true);
         binding.included.setIsEmpty(false);
-        binding.executePendingBindings();*/
 
         return binding.getRoot();
     }

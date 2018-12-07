@@ -57,6 +57,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
         binding.list.setItemAnimator(new DefaultItemAnimator());
         binding.list.setAdapter(mAdapter);
         binding.setIsLoading(true);
+        binding.setIsEmpty(false);
 
         return binding.getRoot();
     }

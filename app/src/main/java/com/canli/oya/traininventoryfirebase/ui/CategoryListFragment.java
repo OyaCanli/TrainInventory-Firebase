@@ -62,6 +62,8 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
         binding.included.list.setItemAnimator(new DefaultItemAnimator());
         binding.included.list.setAdapter(mAdapter);
         binding.included.setIsLoading(true);
+        binding.included.setIsEmpty(false);
+
         return binding.getRoot();
     }
 

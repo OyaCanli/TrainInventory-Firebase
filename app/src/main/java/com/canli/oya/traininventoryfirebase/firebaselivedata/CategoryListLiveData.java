@@ -1,7 +1,5 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
-import android.arch.lifecycle.LiveData;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -15,44 +13,28 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryListLiveData extends LiveData<List<String>> {
+public class CategoryListLiveData extends FirebaseBaseLiveData<List<String>> {
     private static final String LOG_TAG = "CategoryListLiveData";
-
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
     private List<String> categoryList;
-    private final Handler handler = new Handler();
-    private boolean pendingListenerRemoval;
-    private final Runnable removeListener = new Runnable() {
-        @Override
-        public void run() {
-            query.removeEventListener(listener);
-            if (categoryList != null) categoryList.clear();
-            pendingListenerRemoval = false;
-        }
-    };
 
     public CategoryListLiveData(DatabaseReference ref) {
         this.query = ref;
     }
 
+
     @Override
-    protected void onActive() {
-        Log.d(LOG_TAG, "onActive");
-        if (pendingListenerRemoval) {
-            handler.removeCallbacks(removeListener);
-        } else {
-            query.addChildEventListener(listener);
-        }
-        pendingListenerRemoval = false;
+    void removePendingListener() {
+        query.removeEventListener(listener);
+        if (categoryList != null) categoryList.clear();
     }
 
     @Override
-    protected void onInactive() {
-        Log.d(LOG_TAG, "onInactive");
-        handler.postDelayed(removeListener, 2000);
-        pendingListenerRemoval = true;
+    void attachListener() {
+        query.addChildEventListener(listener);
     }
+
 
     private class MyValueEventListener implements ChildEventListener {
 
