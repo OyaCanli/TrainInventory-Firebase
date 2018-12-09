@@ -1,5 +1,6 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
+import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -13,27 +14,37 @@ import com.google.firebase.database.Query;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SearchMapLiveData extends FirebaseBaseLiveData<Map<String, String>> {
+public class SearchMapLiveData extends LiveData<Map<String, String>> {
     private static final String LOG_TAG = "SearchMapLiveData";
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
     private Map<String, String> searchLookup = new HashMap<>();
+    private boolean isChangingConfigutations;
 
     public SearchMapLiveData(DatabaseReference ref) {
         this.query = ref;
     }
 
-
-    @Override
-    void removePendingListener() {
-        query.removeEventListener(listener);
-        searchLookup.clear();
+    public void removeListener() {
+        if (!isChangingConfigutations) {
+            query.removeEventListener(listener);
+            Log.d(LOG_TAG, "listener removed");
+            searchLookup.clear();
+        }
     }
 
-    @Override
-    void attachListener() {
-        query.addChildEventListener(listener);
+    public void attachListener() {
+        if (!isChangingConfigutations) {
+            query.addChildEventListener(listener);
+            Log.d(LOG_TAG, "listener attached");
+        } else {
+            isChangingConfigutations = false;
+        }
+    }
+
+    public void setChangingConfigutations(boolean changingConfigutations) {
+        isChangingConfigutations = changingConfigutations;
     }
 
     private class MyValueEventListener implements ChildEventListener {

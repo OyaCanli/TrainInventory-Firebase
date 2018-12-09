@@ -6,12 +6,12 @@ import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
-import com.canli.oya.traininventoryfirebase.model.Train;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.ChosenTrainLiveData;
 import com.canli.oya.traininventoryfirebase.firebaselivedata.FetchOnceLiveData;
 import com.canli.oya.traininventoryfirebase.firebaselivedata.SearchMapLiveData;
 import com.canli.oya.traininventoryfirebase.firebaselivedata.TrainListLiveData;
-import com.canli.oya.traininventoryfirebase.firebaselivedata.ChosenTrainLiveData;
+import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
+import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,9 +27,9 @@ public class TrainRepository {
 
     private static TrainRepository sInstance;
     private static final String TAG = "TrainRepository";
-    //private LiveData<List<MinimalTrain>> minimalTrains;
     private String trainPushId;
     private TrainListLiveData minimalTrains;
+    private SearchMapLiveData searchLookUp;
 
     private TrainRepository() {
         Log.d(TAG, "new instance of TrainRepository");
@@ -48,6 +48,7 @@ public class TrainRepository {
     public TrainListLiveData getAllMinimalTrains() {
         if(minimalTrains == null){
             minimalTrains = new TrainListLiveData(FirebaseUtils.getMinimalTrainsRef());
+            minimalTrains.attachListener();
         }
         return minimalTrains;
     }
@@ -169,21 +170,52 @@ public class TrainRepository {
         return Transformations.map(livedata, new TrainListDeserializer());
     }
 
-    private class TrainListDeserializer implements Function<DataSnapshot, List<MinimalTrain>> {
-        @Override
-        public List<MinimalTrain> apply(DataSnapshot dataSnapshot) {
-            List<MinimalTrain> minimalTrains = new ArrayList<>();
-            for (DataSnapshot data : dataSnapshot.getChildren()) {
-                minimalTrains.add(data.getValue(MinimalTrain.class));
-            }
-            return minimalTrains;
+    public LiveData<Map<String, String>> loadSearchLookUp(){
+        if (searchLookUp == null) {
+            searchLookUp = new SearchMapLiveData(FirebaseUtils.getSearchLookUpRef());
+            searchLookUp.attachListener();
         }
+        return searchLookUp;
     }
 
     ////////////////////////// SEARCH //////////////////////////////////
 
-    public LiveData<Map<String, String>> loadSearchLookUp(){
-        return new SearchMapLiveData(FirebaseUtils.getSearchLookUpRef());
+    public void setConfigurationChange(boolean configurationChange) {
+        if (minimalTrains != null) {
+            minimalTrains.setChangingConfigutations(configurationChange);
+        }
+        if (searchLookUp != null) {
+            searchLookUp.setChangingConfigutations(configurationChange);
+        }
+    }
+
+    public void removeListener() {
+        if (minimalTrains != null) {
+            minimalTrains.removeListener();
+        }
+        if (searchLookUp != null) {
+            searchLookUp.removeListener();
+        }
+    }
+
+    public void attachListener() {
+        if (minimalTrains != null) {
+            minimalTrains.attachListener();
+        }
+        if (searchLookUp != null) {
+            searchLookUp.attachListener();
+        }
+    }
+
+    private class TrainListDeserializer implements Function<DataSnapshot, List<MinimalTrain>> {
+        @Override
+        public List<MinimalTrain> apply(DataSnapshot dataSnapshot) {
+            List<MinimalTrain> trains = new ArrayList<>();
+            for (DataSnapshot data : dataSnapshot.getChildren()) {
+                trains.add(data.getValue(MinimalTrain.class));
+            }
+            return trains;
+        }
     }
 
 }

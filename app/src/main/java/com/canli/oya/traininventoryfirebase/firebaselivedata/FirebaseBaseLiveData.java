@@ -37,5 +37,6 @@ abstract class FirebaseBaseLiveData<T> extends LiveData<T> {
         Log.d(LOG_TAG, "onInactive");
         handler.postDelayed(removeListener, 2000);
         pendingListenerRemoval = true;
+        removePendingListener();
     }
 }

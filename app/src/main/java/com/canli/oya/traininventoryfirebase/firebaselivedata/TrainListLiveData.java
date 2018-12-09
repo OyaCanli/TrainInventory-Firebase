@@ -1,5 +1,6 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
+import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -14,28 +15,39 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrainListLiveData extends FirebaseBaseLiveData<List<MinimalTrain>> {
+public class TrainListLiveData extends LiveData<List<MinimalTrain>> {
     private static final String LOG_TAG = "TrainListLiveData";
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
     private List<MinimalTrain> trainList;
+    private boolean isChangingConfigutations;
 
     public TrainListLiveData(DatabaseReference ref) {
         this.query = ref;
     }
 
-
-    @Override
-    void removePendingListener() {
-        query.removeEventListener(listener);
-        if (trainList != null) trainList.clear();
+    public void removeListener() {
+        if (!isChangingConfigutations) {
+            query.removeEventListener(listener);
+            Log.d(LOG_TAG, "listener removed");
+            if (trainList != null) trainList.clear();
+        }
     }
 
-    @Override
-    void attachListener() {
-        query.addChildEventListener(listener);
+    public void attachListener() {
+        if (!isChangingConfigutations) {
+            query.addChildEventListener(listener);
+            Log.d(LOG_TAG, "listener attached");
+        } else {
+            isChangingConfigutations = false;
+        }
     }
+
+    public void setChangingConfigutations(boolean changingConfigutations) {
+        isChangingConfigutations = changingConfigutations;
+    }
+
 
     private class MyValueEventListener implements ChildEventListener {
 

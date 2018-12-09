@@ -75,4 +75,6 @@
     <string name="sign_out">Sign out</string>
     <string name="sign_in">Sign in >></string>
     <string name="cd_app_logo">App logo</string>
+    <string name="need_to_sign_in">You need to sign-in in order to use the app</string>
+    <string name="signed_in">Signed in!</string>
 </resources>

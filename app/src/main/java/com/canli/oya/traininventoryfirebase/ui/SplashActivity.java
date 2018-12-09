@@ -38,6 +38,7 @@ public class SplashActivity extends AppCompatActivity {
             } else {
                 Log.d(TAG, "user is not null, starting main activity");
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                finish();
             }
         }
     };
@@ -74,13 +75,13 @@ public class SplashActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Log.d(TAG, "result ok");
                 // Sign-in succeeded, set up the UI
-                Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.signed_in), Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
                 finish();
             } else if (resultCode == RESULT_CANCELED) {
                 Log.d(TAG, "result cancelled");
                 Snackbar snackbar = Snackbar
-                        .make(binding.getRoot(), "You need to sign-in in order to use the app", Snackbar.LENGTH_INDEFINITE)
+                        .make(binding.getRoot(), R.string.need_to_sign_in, Snackbar.LENGTH_INDEFINITE)
                         .setAction(R.string.sign_in, new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {

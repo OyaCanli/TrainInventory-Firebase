@@ -61,4 +61,22 @@ public class CategoryRepository {
     public interface CategoryUseListener{
         void onCategoryUseCaseReturned(boolean isCategoryUsed);
     }
+
+    public void setConfigurationChange(boolean configurationChange) {
+        if (categoryList != null) {
+            categoryList.setChangingConfigutations(configurationChange);
+        }
+    }
+
+    public void removeListener() {
+        if (categoryList != null) {
+            categoryList.removeListener();
+        }
+    }
+
+    public void attachListener() {
+        if (categoryList != null) {
+            categoryList.attachListener();
+        }
+    }
 }

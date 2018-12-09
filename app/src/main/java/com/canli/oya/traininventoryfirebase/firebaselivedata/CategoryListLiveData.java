@@ -1,5 +1,6 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
+import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -13,28 +14,38 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryListLiveData extends FirebaseBaseLiveData<List<String>> {
+public class CategoryListLiveData extends LiveData<List<String>> {
     private static final String LOG_TAG = "CategoryListLiveData";
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
     private List<String> categoryList;
+    private boolean isChangingConfigutations;
 
     public CategoryListLiveData(DatabaseReference ref) {
         this.query = ref;
     }
 
 
-    @Override
-    void removePendingListener() {
-        query.removeEventListener(listener);
-        if (categoryList != null) categoryList.clear();
+    public void removeListener() {
+        if (!isChangingConfigutations) {
+            query.removeEventListener(listener);
+            Log.d(LOG_TAG, "listener removed");
+            if (categoryList != null) categoryList.clear();
+        }
     }
 
-    @Override
-    void attachListener() {
-        query.addChildEventListener(listener);
+    public void attachListener() {
+        if (!isChangingConfigutations) {
+            query.addChildEventListener(listener);
+            Log.d(LOG_TAG, "listener attached");
+        } else {
+            isChangingConfigutations = false;
+        }
     }
 
+    public void setChangingConfigutations(boolean changingConfigutations) {
+        isChangingConfigutations = changingConfigutations;
+    }
 
     private class MyValueEventListener implements ChildEventListener {
 
@@ -48,7 +59,6 @@ public class CategoryListLiveData extends FirebaseBaseLiveData<List<String>> {
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
         }
 
         @Override

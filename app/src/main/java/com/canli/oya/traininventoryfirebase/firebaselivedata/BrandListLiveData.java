@@ -1,5 +1,6 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
+import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -14,28 +15,39 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BrandListLiveData extends FirebaseBaseLiveData<List<Brand>> {
+public class BrandListLiveData extends LiveData<List<Brand>> {
     private static final String LOG_TAG = "BrandListLiveData";
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
     private List<Brand> brandList;
+    private boolean isChangingConfigutations;
 
     public BrandListLiveData(DatabaseReference ref) {
         this.query = ref;
     }
 
-
-    @Override
-    void removePendingListener() {
-        query.removeEventListener(listener);
-        if (brandList != null) brandList.clear();
+    public void removeListener() {
+        if (!isChangingConfigutations) {
+            query.removeEventListener(listener);
+            Log.d(LOG_TAG, "listener removed");
+            if (brandList != null) brandList.clear();
+        }
     }
 
-    @Override
-    void attachListener() {
-        query.addChildEventListener(listener);
+    public void attachListener() {
+        if (!isChangingConfigutations) {
+            query.addChildEventListener(listener);
+            Log.d(LOG_TAG, "listener attached");
+        } else {
+            isChangingConfigutations = false;
+        }
     }
+
+    public void setChangingConfigutations(boolean changingConfigutations) {
+        isChangingConfigutations = changingConfigutations;
+    }
+
 
     private class MyValueEventListener implements ChildEventListener {
 
@@ -79,4 +91,5 @@ public class BrandListLiveData extends FirebaseBaseLiveData<List<Brand>> {
             Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
         }
     }
+
 }

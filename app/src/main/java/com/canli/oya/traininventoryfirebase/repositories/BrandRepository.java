@@ -3,8 +3,8 @@ package com.canli.oya.traininventoryfirebase.repositories;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.firebaselivedata.BrandListLiveData;
+import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,13 +14,12 @@ public class BrandRepository {
 
     private static BrandRepository sInstance;
     private static final String TAG = "BrandRepository";
-    private final BrandListLiveData brandList;
+    private BrandListLiveData brandList;
     private boolean brandIsUsed;
     private BrandUseListener mCallback;
 
     private BrandRepository(BrandUseListener listener) {
         Log.d(TAG, "new instance of BrandRepository");
-        brandList = new BrandListLiveData(FirebaseUtils.getBrandsRef());
         mCallback = listener;
     }
 
@@ -34,6 +33,10 @@ public class BrandRepository {
     }
 
     public BrandListLiveData getBrandList() {
+        if (brandList == null) {
+            brandList = new BrandListLiveData(FirebaseUtils.getBrandsRef());
+            brandList.attachListener();
+        }
         return brandList;
     }
 
@@ -66,6 +69,24 @@ public class BrandRepository {
 
     public interface BrandUseListener{
         void onBrandUseCaseReturned(boolean isBrandUsed);
+    }
+
+    public void setConfigurationChange(boolean configurationChange) {
+        if (brandList != null) {
+            brandList.setChangingConfigutations(configurationChange);
+        }
+    }
+
+    public void removeListener() {
+        if (brandList != null) {
+            brandList.removeListener();
+        }
+    }
+
+    public void attachListener() {
+        if (brandList != null) {
+            brandList.attachListener();
+        }
     }
 
 }

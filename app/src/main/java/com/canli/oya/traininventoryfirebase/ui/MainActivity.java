@@ -20,6 +20,9 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.canli.oya.traininventoryfirebase.R;
 import com.canli.oya.traininventoryfirebase.databinding.ActivityMainBinding;
+import com.canli.oya.traininventoryfirebase.repositories.BrandRepository;
+import com.canli.oya.traininventoryfirebase.repositories.CategoryRepository;
+import com.canli.oya.traininventoryfirebase.repositories.TrainRepository;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,6 +45,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user == null) {
                 Log.d(TAG, "user logged out");
+
+                /*remove listeners immediately on sign out, because onInactive is
+                called later and it gives an exception otherwise*/
+                removeListeners();
+
                 //Go to splash activity
                 startActivity(new Intent(MainActivity.this, SplashActivity.class));
                 finish();
@@ -51,13 +59,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
 
         //Set toolbar
         setSupportActionBar(binding.toolbar);
@@ -75,11 +83,40 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onResume() {
+        super.onResume();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        attachListeners();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause is called");
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
+        setChangingConfigurations(isChangingConfigurations());
+        removeListeners();
+    }
+
+    private void setChangingConfigurations(boolean changingConfigurations) {
+        CategoryRepository.getInstance(null).setConfigurationChange(changingConfigurations);
+        BrandRepository.getInstance(null).setConfigurationChange(changingConfigurations);
+        TrainRepository.getInstance().setConfigurationChange(changingConfigurations);
+    }
+
+    private void removeListeners() {
+        //ToDO: if brandrepo is not initialized yet?
+        TrainRepository.getInstance().removeListener();
+        BrandRepository.getInstance(null).removeListener();
+        CategoryRepository.getInstance(null).removeListener();
+    }
+
+    private void attachListeners() {
+        TrainRepository.getInstance().attachListener();
+        BrandRepository.getInstance(null).attachListener();
+        CategoryRepository.getInstance(null).attachListener();
     }
 
     @Override
