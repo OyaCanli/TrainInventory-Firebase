@@ -25,6 +25,8 @@ public class BrandListLiveData extends LiveData<List<Brand>> {
 
     public BrandListLiveData(DatabaseReference ref) {
         this.query = ref;
+        query.addChildEventListener(listener);
+        Log.d(LOG_TAG, "new instance created");
     }
 
     public void removeListener() {

@@ -140,8 +140,6 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
         if (itemId == R.id.action_add) {
             openAddBrandFragment();
         } else if (itemId == R.id.sign_out) {
-            startActivity(new Intent(getActivity(), SplashActivity.class));
-            getActivity().finish();
             AuthUI.getInstance().signOut(getActivity());
         }
         return super.onOptionsItemSelected(item);

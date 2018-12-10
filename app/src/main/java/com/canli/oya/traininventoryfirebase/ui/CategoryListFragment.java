@@ -2,7 +2,6 @@ package com.canli.oya.traininventoryfirebase.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -130,8 +129,6 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
         if (itemId == R.id.action_add) {
             openAddCategoryFragment();
         } else if (itemId == R.id.sign_out) {
-            startActivity(new Intent(getActivity(), SplashActivity.class));
-            getActivity().finish();
             AuthUI.getInstance().signOut(getActivity());
         }
         return super.onOptionsItemSelected(item);

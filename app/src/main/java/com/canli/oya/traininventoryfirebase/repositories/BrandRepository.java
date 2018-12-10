@@ -32,10 +32,13 @@ public class BrandRepository {
         return sInstance;
     }
 
+    public static BrandRepository getNullableInstance() {
+        return sInstance;
+    }
+
     public BrandListLiveData getBrandList() {
         if (brandList == null) {
             brandList = new BrandListLiveData(FirebaseUtils.getBrandsRef());
-            brandList.attachListener();
         }
         return brandList;
     }

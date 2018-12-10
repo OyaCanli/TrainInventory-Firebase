@@ -25,6 +25,8 @@ public class TrainListLiveData extends LiveData<List<MinimalTrain>> {
 
     public TrainListLiveData(DatabaseReference ref) {
         this.query = ref;
+        query.addChildEventListener(listener);
+        Log.d(LOG_TAG, "new instance created");
     }
 
     public void removeListener() {

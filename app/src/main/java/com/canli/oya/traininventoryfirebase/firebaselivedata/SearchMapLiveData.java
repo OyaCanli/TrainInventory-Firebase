@@ -24,6 +24,8 @@ public class SearchMapLiveData extends LiveData<Map<String, String>> {
 
     public SearchMapLiveData(DatabaseReference ref) {
         this.query = ref;
+        query.addChildEventListener(listener);
+        Log.d(LOG_TAG, "new instance created");
     }
 
     public void removeListener() {

@@ -101,21 +101,29 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     private void setChangingConfigurations(boolean changingConfigurations) {
-        CategoryRepository.getInstance(null).setConfigurationChange(changingConfigurations);
-        BrandRepository.getInstance(null).setConfigurationChange(changingConfigurations);
         TrainRepository.getInstance().setConfigurationChange(changingConfigurations);
+        //BrandRepository shouldn't be initialized with a null listener if it is not initialized before
+        if (BrandRepository.getNullableInstance() != null) {
+            BrandRepository.getInstance(null).setConfigurationChange(changingConfigurations);
+        }
+        CategoryRepository.getInstance(null).setConfigurationChange(changingConfigurations);
     }
 
     private void removeListeners() {
-        //ToDO: if brandrepo is not initialized yet?
         TrainRepository.getInstance().removeListener();
-        BrandRepository.getInstance(null).removeListener();
+        //BrandRepository shouldn't be initialized with a null listener if it is not initialized before
+        if (BrandRepository.getNullableInstance() != null) {
+            BrandRepository.getInstance(null).removeListener();
+        }
         CategoryRepository.getInstance(null).removeListener();
     }
 
     private void attachListeners() {
         TrainRepository.getInstance().attachListener();
-        BrandRepository.getInstance(null).attachListener();
+        //BrandRepository shouldn't be initialized with a null listener if it is not initialized before
+        if (BrandRepository.getNullableInstance() != null) {
+            BrandRepository.getInstance(null).attachListener();
+        }
         CategoryRepository.getInstance(null).attachListener();
     }
 

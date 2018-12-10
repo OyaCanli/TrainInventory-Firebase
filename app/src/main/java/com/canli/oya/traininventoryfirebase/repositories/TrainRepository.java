@@ -48,7 +48,6 @@ public class TrainRepository {
     public TrainListLiveData getAllMinimalTrains() {
         if(minimalTrains == null){
             minimalTrains = new TrainListLiveData(FirebaseUtils.getMinimalTrainsRef());
-            minimalTrains.attachListener();
         }
         return minimalTrains;
     }
@@ -173,7 +172,6 @@ public class TrainRepository {
     public LiveData<Map<String, String>> loadSearchLookUp(){
         if (searchLookUp == null) {
             searchLookUp = new SearchMapLiveData(FirebaseUtils.getSearchLookUpRef());
-            searchLookUp.attachListener();
         }
         return searchLookUp;
     }
