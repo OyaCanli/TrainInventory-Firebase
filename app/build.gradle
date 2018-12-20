@@ -54,15 +54,19 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
     //Room
     implementation "android.arch.persistence.room:runtime:${rootProject.ext.roomVersion}"
     annotationProcessor "android.arch.persistence.room:compiler:${rootProject.ext.roomVersion}"
+
     //ViewModel and liveData
     implementation "android.arch.lifecycle:extensions:${rootProject.ext.lifecycleVersion}"
     annotationProcessor "android.arch.lifecycle:compiler:${rootProject.ext.lifecycleVersion}"
+
     //Glide
     implementation "com.github.bumptech.glide:glide:${rootProject.ext.glideVersion}"
     annotationProcessor "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
+
     //Firebase
     implementation 'com.google.firebase:firebase-core:16.0.6'
     implementation 'com.google.firebase:firebase-database:16.0.5'

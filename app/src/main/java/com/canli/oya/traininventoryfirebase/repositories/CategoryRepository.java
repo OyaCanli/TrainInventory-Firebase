@@ -17,19 +17,22 @@ public class CategoryRepository {
     private boolean categoryIsUsed;
     private CategoryUseListener mCallback;
 
-    private CategoryRepository(CategoryUseListener listener) {
+    private CategoryRepository() {
         Log.d(TAG, "new instance of CategoryRepository");
         categoryList = new CategoryListLiveData(FirebaseUtils.getCategoriesRef());
-        mCallback = listener;
     }
 
-    public static CategoryRepository getInstance(CategoryUseListener listener) {
+    public static CategoryRepository getInstance() {
         if (sInstance == null) {
             synchronized (CategoryRepository.class) {
-                sInstance = new CategoryRepository(listener);
+                sInstance = new CategoryRepository();
             }
         }
         return sInstance;
+    }
+
+    public void setListener(CategoryUseListener mCallback) {
+        this.mCallback = mCallback;
     }
 
     public CategoryListLiveData getCategoryList() {

@@ -18,19 +18,22 @@ public class BrandRepository {
     private boolean brandIsUsed;
     private BrandUseListener mCallback;
 
-    private BrandRepository(BrandUseListener listener) {
+    private BrandRepository() {
         Log.d(TAG, "new instance of BrandRepository");
         brandList = new BrandListLiveData(FirebaseUtils.getBrandsRef());
-        mCallback = listener;
     }
 
-    public static BrandRepository getInstance(BrandUseListener listener){
+    public static BrandRepository getInstance(){
         if (sInstance == null) {
             synchronized (BrandRepository.class) {
-                sInstance = new BrandRepository(listener);
+                sInstance = new BrandRepository();
             }
         }
         return sInstance;
+    }
+
+    public void setListener(BrandUseListener mCallback) {
+        this.mCallback = mCallback;
     }
 
     public BrandListLiveData getBrandList() {

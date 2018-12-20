@@ -4,15 +4,15 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
+import com.canli.oya.traininventoryfirebase.firebaselivedata.BrandListLiveData;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.CategoryListLiveData;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.TrainListLiveData;
 import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.repositories.BrandRepository;
 import com.canli.oya.traininventoryfirebase.repositories.CategoryRepository;
 import com.canli.oya.traininventoryfirebase.repositories.TrainRepository;
-import com.canli.oya.traininventoryfirebase.firebaselivedata.BrandListLiveData;
-import com.canli.oya.traininventoryfirebase.firebaselivedata.CategoryListLiveData;
-import com.canli.oya.traininventoryfirebase.firebaselivedata.TrainListLiveData;
 
 import java.util.List;
 import java.util.Map;
@@ -57,7 +57,8 @@ public class MainViewModel extends ViewModel {
     ////////////// BRAND LIST //////////////////
 
     public void initializeBrandRepo(BrandRepository.BrandUseListener listener){
-        mBrandRepo = BrandRepository.getInstance(listener);
+        mBrandRepo = BrandRepository.getInstance();
+        mBrandRepo.setListener(listener);
     }
 
     public BrandListLiveData getBrandList() {
@@ -95,7 +96,8 @@ public class MainViewModel extends ViewModel {
     //////////////// CATEGORY LIST //////////////////
 
     public void initializeCategoryRepo(CategoryRepository.CategoryUseListener listener){
-        mCategoryRepo = CategoryRepository.getInstance(listener);
+        mCategoryRepo = CategoryRepository.getInstance();
+        mCategoryRepo.setListener(listener);
     }
 
     public CategoryListLiveData getCategoryList() {
