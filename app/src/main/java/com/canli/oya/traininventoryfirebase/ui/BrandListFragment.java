@@ -16,7 +16,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +35,8 @@ import com.firebase.ui.auth.AuthUI;
 
 import java.util.List;
 
+import timber.log.Timber;
+
 public class BrandListFragment extends Fragment implements BrandAdapter.BrandItemClickListener,
         BrandRepository.BrandUseListener {
 
@@ -45,7 +46,6 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
     private FragmentListBinding binding;
     private Brand brandToErase;
     private CoordinatorLayout coordinator;
-    private static final String TAG = "BrandListFragment";
 
     public BrandListFragment() {
         setRetainInstance(true);
@@ -63,7 +63,6 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
         binding.included.list.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.included.list.setItemAnimator(new DefaultItemAnimator());
         binding.included.list.setAdapter(adapter);
-        Log.d(TAG, "onCreateView called");
         binding.included.setIsLoading(true);
         binding.included.setIsEmpty(false);
 
@@ -80,20 +79,20 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
             @Override
             public void onChanged(@Nullable List<Brand> brandEntries) {
                 if (brandEntries != null) {
-                    Log.d(TAG, "onChange is called,data is not null");
+                    Timber.d("onChange is called,data is not null");
                     binding.included.setIsLoading(false);
                     if (brandEntries.isEmpty()) {
-                        Log.d(TAG, "onChange is called, list is empty");
+                        Timber.d("onChange is called, list is empty");
                         binding.included.setIsEmpty(true);
                         binding.included.setEmptyMessage(getString(R.string.no_brands_found));
                     } else {
-                        Log.d(TAG, "onChange is called, list is not empty");
+                        Timber.d("onChange is called, list is not empty");
                         adapter.setBrands(brandEntries);
                         brands = brandEntries;
                         binding.included.setIsEmpty(false);
                     }
                 } else {
-                    Log.d(TAG, "onChange is called but data is null");
+                    Timber.d("onChange is called but data is null");
                 }
             }
         });
@@ -195,7 +194,7 @@ public class BrandListFragment extends Fragment implements BrandAdapter.BrandIte
             try {
                 webUri = Uri.parse(urlString);
             } catch (Exception e) {
-                Log.e("BrandListFragment", e.toString());
+                Timber.e(e.toString());
             }
             Intent webIntent = new Intent(Intent.ACTION_VIEW);
             webIntent.setData(webUri);

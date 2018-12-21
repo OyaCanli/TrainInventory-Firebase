@@ -20,7 +20,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,12 +51,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 import static android.app.Activity.RESULT_OK;
 
 public class AddTrainFragment extends Fragment implements View.OnClickListener,
         AdapterView.OnItemSelectedListener, UploadImageAsyncTask.ImageUploadListener {
 
-    private static final String TAG = "AddTrainFragment";
     private FragmentAddTrainBinding binding;
     private String mChosenCategory;
     private String mChosenBrand;
@@ -102,7 +102,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onImageUploaded(Uri imageUri, boolean loadingSuccessful) {
-        Log.d(TAG, "onImageUploaded called");
+        Timber.d("onImageUploaded called");
         if (loadingSuccessful) {
             if (isEdit) {
                 String previousUrl = mTrainToUpdate.getImageUri();
@@ -142,7 +142,6 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
         binding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_add_train, container, false);
 
-        Log.d(TAG, "onCreateView is called");
         setHasOptionsMenu(true);
 
         //Set click listener on buttons
@@ -158,8 +157,6 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        Log.d(TAG, "onActivityCreated is called");
 
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.initializeBrandRepo(null);
@@ -215,7 +212,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
                 @Override
                 public void onChanged(@Nullable Train train) {
                     if (train != null) {
-                        Log.d(TAG, "chosen train loaded");
+                        Timber.d("chosen train loaded");
                         binding.setChosenTrain(train);
                         binding.executePendingBindings();
                         mChosenTrain = train;
@@ -537,7 +534,7 @@ public class AddTrainFragment extends Fragment implements View.OnClickListener,
             try {
                 quantity = Integer.valueOf(quantityToParse);
             } catch (NumberFormatException nfe) {
-                Log.e(TAG, nfe.getMessage());
+                Timber.e(nfe.getMessage());
             }
         }
         String reference = binding.editReference.getText().toString().trim();

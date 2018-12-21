@@ -14,7 +14,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +32,8 @@ import com.firebase.ui.auth.AuthUI;
 
 import java.util.List;
 
+import timber.log.Timber;
+
 public class CategoryListFragment extends Fragment implements CategoryAdapter.CategoryItemClickListener,
         CategoryRepository.CategoryUseListener {
 
@@ -42,7 +43,6 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     private MainViewModel mViewModel;
     private CoordinatorLayout coordinator;
     private String categoryToErase;
-    private static final String TAG = "CategoryListFragment";
 
     public CategoryListFragment() {
         setRetainInstance(true);
@@ -71,7 +71,6 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getActivity().setTitle(getString(R.string.all_categories));
-        Log.d(TAG, "onActivityCreated is called");
         coordinator = getActivity().findViewById(R.id.coordinator);
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.initializeCategoryRepo(this);
@@ -79,20 +78,20 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
             @Override
             public void onChanged(@Nullable List<String> categoryEntries) {
                 if (categoryEntries != null) {
-                    Log.d(TAG, "onChange is called,data is not null");
+                    Timber.d("onChange is called,data is not null");
                     binding.included.setIsLoading(false);
                     if (categoryEntries.isEmpty()) {
-                        Log.d(TAG, "onChange is called, list is empty");
+                        Timber.d("onChange is called, list is empty");
                         binding.included.setIsEmpty(true);
                         binding.included.setEmptyMessage(getString(R.string.no_categories_found));
                     } else {
-                        Log.d(TAG, "onChange is called, list is not empty");
+                        Timber.d("onChange is called, list is not empty");
                         mAdapter.setCategories(categoryEntries);
                         mCategories = categoryEntries;
                         binding.included.setIsEmpty(false);
                     }
                 } else {
-                    Log.d(TAG, "onChange is called but data is null");
+                    Timber.d("onChange is called but data is null");
                 }
             }
         });

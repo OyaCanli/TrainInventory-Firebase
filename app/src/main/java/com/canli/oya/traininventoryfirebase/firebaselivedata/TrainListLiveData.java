@@ -2,7 +2,6 @@ package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
 import com.google.firebase.database.ChildEventListener;
@@ -14,8 +13,9 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class TrainListLiveData extends FirebaseBaseLiveData<List<MinimalTrain>> {
-    private static final String LOG_TAG = "TrainListLiveData";
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
@@ -44,7 +44,7 @@ public class TrainListLiveData extends FirebaseBaseLiveData<List<MinimalTrain>> 
             if (trainList == null) trainList = new ArrayList<>();
             trainList.add(dataSnapshot.getValue(MinimalTrain.class));
             setValue(trainList);
-            Log.d(LOG_TAG, "onChildAdded. list size: " + trainList.size());
+            Timber.d("onChildAdded. list size: " + trainList.size());
         }
 
         @Override
@@ -57,7 +57,7 @@ public class TrainListLiveData extends FirebaseBaseLiveData<List<MinimalTrain>> 
                     setValue(trainList);
                 }
             }
-            Log.d(LOG_TAG, "onChildChanged. list size: " + listSize);
+            Timber.d("onChildChanged. list size: " + listSize);
         }
 
         @Override
@@ -69,7 +69,7 @@ public class TrainListLiveData extends FirebaseBaseLiveData<List<MinimalTrain>> 
                     setValue(trainList);
                 }
             }
-            Log.d(LOG_TAG, "onChildRemoved. list size: " + trainList.size());
+            Timber.d("onChildRemoved. list size: " + trainList.size());
         }
 
         @Override
@@ -77,7 +77,7 @@ public class TrainListLiveData extends FirebaseBaseLiveData<List<MinimalTrain>> 
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Timber.e("Can't listen to query " + query + databaseError.toException());
         }
     }
 }

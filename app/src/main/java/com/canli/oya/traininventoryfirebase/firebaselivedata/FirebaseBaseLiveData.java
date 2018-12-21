@@ -2,10 +2,10 @@ package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
 import android.arch.lifecycle.LiveData;
 import android.os.Handler;
-import android.util.Log;
+
+import timber.log.Timber;
 
 abstract class FirebaseBaseLiveData<T> extends LiveData<T> {
-    private static final String LOG_TAG = "TrainListLiveData";
 
     private final Handler handler = new Handler();
     private boolean pendingListenerRemoval;
@@ -19,7 +19,7 @@ abstract class FirebaseBaseLiveData<T> extends LiveData<T> {
 
     @Override
     protected void onActive() {
-        Log.d(LOG_TAG, "onActive");
+        Timber.d("onActive");
         if (pendingListenerRemoval) {
             handler.removeCallbacks(removeListener);
         } else {
@@ -34,7 +34,7 @@ abstract class FirebaseBaseLiveData<T> extends LiveData<T> {
 
     @Override
     protected void onInactive() {
-        Log.d(LOG_TAG, "onInactive");
+        Timber.d("onInactive");
         handler.postDelayed(removeListener, 2000);
         pendingListenerRemoval = true;
     }

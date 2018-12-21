@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,12 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 public class TrainListFragment extends Fragment implements TrainAdapter.TrainItemClickListener {
 
     private TrainAdapter mAdapter;
     private List<MinimalTrain> mTrainList;
     private FragmentTrainListBinding binding;
-    private static final String TAG = "TrainListFragment";
     private Map<String, String> mSearchLookUp;
 
     public TrainListFragment() {
@@ -80,20 +80,20 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries != null) {
-                                Log.d(TAG, "onChange is called,data is not null");
+                                Timber.d("onChange is called,data is not null");
                                 binding.setIsLoading(false);
                                 if (trainEntries.isEmpty()) {
-                                    Log.d(TAG, "onChange is called, list is empty");
+                                    Timber.d("onChange is called, list is empty");
                                     binding.setIsEmpty(true);
                                     binding.setEmptyMessage(getString(R.string.no_train_for_this_brand));
                                 } else {
-                                    Log.d(TAG, "onChange is called, list is not empty");
+                                    Timber.d("onChange is called, list is not empty");
                                     binding.setIsEmpty(false);
                                     mAdapter.setTrains(trainEntries);
                                     mTrainList = trainEntries;
                                 }
                             } else {
-                                Log.d(TAG, "onChange is called but data is null");
+                                Timber.d("onChange is called but data is null");
                             }
                         }
                     });
@@ -233,7 +233,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
         List<MinimalTrain> filteredTrainList = new ArrayList<>();
         for (MinimalTrain minimalTrain : mTrainList) {
             if (resultIds.contains(minimalTrain.getTrainId())) {
-                Log.d(TAG, "trainID" + minimalTrain.getTrainId());
+                Timber.d("trainID" + minimalTrain.getTrainId());
                 filteredTrainList.add(minimalTrain);
             }
         }

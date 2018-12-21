@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,13 +20,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import timber.log.Timber;
+
 public class UploadImageAsyncTask extends AsyncTask<Context, Void, Void> {
 
     public interface ImageUploadListener {
         void onImageUploaded(Uri imageUri, boolean loadingSuccessful);
     }
 
-    private static final String TAG = "UploadImageAsynctask";
     private static final int IMAGE_MAX_DIMENSION = 640;
     private ImageUploadListener mCallback;
     private Uri mUri;
@@ -51,9 +51,9 @@ public class UploadImageAsyncTask extends AsyncTask<Context, Void, Void> {
         try {
             bitmap = decodeSampledBitmapFromUri(mUri, context);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Can't find file to resize: " + e.getMessage());
+            Timber.e("Can't find file to resize: " + e.getMessage());
         } catch (IOException e) {
-            Log.e(TAG, "Error occurred during resize: " + e.getMessage());
+            Timber.e("Error occurred during resize: " + e.getMessage());
         }
 
         //Then compress it
@@ -88,7 +88,7 @@ public class UploadImageAsyncTask extends AsyncTask<Context, Void, Void> {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "photo is not successfully uploaded");
+                Timber.e("photo is not successfully uploaded");
                 mCallback.onImageUploaded(null, false);
             }
         });

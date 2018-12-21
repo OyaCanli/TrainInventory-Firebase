@@ -13,7 +13,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -23,6 +22,8 @@ import com.canli.oya.traininventoryfirebase.databinding.ActivityMainBinding;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import timber.log.Timber;
 
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
@@ -34,19 +35,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private TrainListFragment mTrainListFragment;
     private BrandListFragment mBrandListFragment;
     private CategoryListFragment mCategoryListFragment;
-    private static final String TAG = "MainActivity";
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
         @Override
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
             FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user == null) {
-                Log.d(TAG, "user logged out");
+                Timber.d("user logged out");
                 //Go to splash activity
                 startActivity(new Intent(MainActivity.this, SplashActivity.class));
                 finish();
             } else {
-                Log.d(TAG, "user logged in");
+                Timber.d("user logged in");
             }
         }
     };

@@ -1,7 +1,6 @@
 package com.canli.oya.traininventoryfirebase.repositories;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.firebaselivedata.CategoryListLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
@@ -9,16 +8,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import timber.log.Timber;
+
 public class CategoryRepository {
 
     private static CategoryRepository sInstance;
-    private static final String TAG = "CategoryRepository";
     private final CategoryListLiveData categoryList;
     private boolean categoryIsUsed;
     private CategoryUseListener mCallback;
 
     private CategoryRepository() {
-        Log.d(TAG, "new instance of CategoryRepository");
+        Timber.d("new instance of CategoryRepository");
         categoryList = new CategoryListLiveData(FirebaseUtils.getCategoriesRef());
     }
 

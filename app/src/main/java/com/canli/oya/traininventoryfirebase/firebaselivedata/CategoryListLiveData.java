@@ -2,7 +2,6 @@ package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -13,8 +12,9 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class CategoryListLiveData extends FirebaseBaseLiveData<List<String>> {
-    private static final String LOG_TAG = "CategoryListLiveData";
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
     private List<String> categoryList;
@@ -43,7 +43,7 @@ public class CategoryListLiveData extends FirebaseBaseLiveData<List<String>> {
             if (categoryList == null) categoryList = new ArrayList<>();
             categoryList.add(dataSnapshot.getValue(String.class));
             setValue(categoryList);
-            Log.d(LOG_TAG, "onChildAdded. list size: " + categoryList.size());
+            Timber.d("onChildAdded. list size: " + categoryList.size());
         }
 
         @Override
@@ -54,7 +54,7 @@ public class CategoryListLiveData extends FirebaseBaseLiveData<List<String>> {
         @Override
         public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
             categoryList.remove(dataSnapshot.getKey());
-            Log.d(LOG_TAG, "onChildRemoved. list size: " + categoryList.size());
+            Timber.d("onChildRemoved. list size: " + categoryList.size());
         }
 
         @Override
@@ -63,7 +63,7 @@ public class CategoryListLiveData extends FirebaseBaseLiveData<List<String>> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Timber.e("Can't listen to query " + query + databaseError.toException());
         }
     }
 }

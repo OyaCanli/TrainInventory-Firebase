@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,13 +27,14 @@ import com.canli.oya.traininventoryfirebase.viewmodel.ChosenTrainViewModel;
 import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 import com.firebase.ui.auth.AuthUI;
 
+import timber.log.Timber;
+
 public class TrainDetailsFragment extends Fragment {
 
     private FragmentTrainDetailsBinding binding;
     private Train mChosenTrain;
     private String mTrainId;
     private MainViewModel mainViewModel;
-    private static final String TAG = "TrainDetailsFragment";
 
     public TrainDetailsFragment() {
     }
@@ -56,7 +56,7 @@ public class TrainDetailsFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             mTrainId = bundle.getString(Constants.TRAIN_ID);
-            Log.d(TAG, "trainID = " + mTrainId);
+            Timber.d("trainID = " + mTrainId);
         }
         mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         ChosenTrainFactory factory = InjectorUtils.provideChosenTrainFactory(mTrainId);

@@ -4,14 +4,13 @@ import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
-import com.canli.oya.traininventoryfirebase.model.Train;
+import com.canli.oya.traininventoryfirebase.firebaselivedata.ChosenTrainLiveData;
 import com.canli.oya.traininventoryfirebase.firebaselivedata.FetchOnceLiveData;
 import com.canli.oya.traininventoryfirebase.firebaselivedata.SearchMapLiveData;
 import com.canli.oya.traininventoryfirebase.firebaselivedata.TrainListLiveData;
-import com.canli.oya.traininventoryfirebase.firebaselivedata.ChosenTrainLiveData;
+import com.canli.oya.traininventoryfirebase.model.MinimalTrain;
+import com.canli.oya.traininventoryfirebase.model.Train;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -23,16 +22,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 public class TrainRepository {
 
     private static TrainRepository sInstance;
-    private static final String TAG = "TrainRepository";
-    //private LiveData<List<MinimalTrain>> minimalTrains;
     private String trainPushId;
     private TrainListLiveData minimalTrains;
 
     private TrainRepository() {
-        Log.d(TAG, "new instance of TrainRepository");
+        Timber.d("new instance of TrainRepository");
     }
 
     public static TrainRepository getInstance() {
@@ -148,12 +147,12 @@ public class TrainRepository {
                     .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "image successfully deleted");
+                            Timber.d("image successfully deleted");
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "error during deleting image");
+                            Timber.e("error during deleting image");
                         }
                     });
         }

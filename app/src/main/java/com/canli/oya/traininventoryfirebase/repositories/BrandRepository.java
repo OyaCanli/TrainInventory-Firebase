@@ -1,25 +1,25 @@
 package com.canli.oya.traininventoryfirebase.repositories;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.firebaselivedata.BrandListLiveData;
+import com.canli.oya.traininventoryfirebase.model.Brand;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import timber.log.Timber;
+
 public class BrandRepository {
 
     private static BrandRepository sInstance;
-    private static final String TAG = "BrandRepository";
     private final BrandListLiveData brandList;
     private boolean brandIsUsed;
     private BrandUseListener mCallback;
 
     private BrandRepository() {
-        Log.d(TAG, "new instance of BrandRepository");
+        Timber.d("new instance of BrandRepository");
         brandList = new BrandListLiveData(FirebaseUtils.getBrandsRef());
     }
 
