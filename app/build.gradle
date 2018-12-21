@@ -73,5 +73,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.1.0'
     implementation 'com.google.firebase:firebase-storage:16.0.5'
     implementation 'com.firebaseui:firebase-ui-auth:4.2.0'
+
+    //Timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 }
 apply plugin: 'com.google.gms.google-services'
