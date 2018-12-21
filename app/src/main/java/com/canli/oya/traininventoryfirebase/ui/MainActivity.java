@@ -13,7 +13,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -27,6 +26,8 @@ import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import timber.log.Timber;
+
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
         AddTrainFragment.UnsavedChangesListener, FragmentManager.OnBackStackChangedListener {
@@ -37,28 +38,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private TrainListFragment mTrainListFragment;
     private BrandListFragment mBrandListFragment;
     private CategoryListFragment mCategoryListFragment;
-    private static final String TAG = "MainActivity";
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
         @Override
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
             FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user == null) {
-                Log.d(TAG, "user logged out");
-
-                /*remove listeners immediately on sign out, because onInactive is
-                called later and it gives an exception otherwise*/
-                removeListeners();
-
+                Timber.d("user logged out");
                 //Go to splash activity
                 startActivity(new Intent(MainActivity.this, SplashActivity.class));
                 finish();
             } else {
-                Log.d(TAG, "user logged in");
+                Timber.d("user logged in");
             }
         }
     };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,43 +79,25 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onResume() {
         super.onResume();
+        Timber.d("onResume is called");
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-        attachListeners();
+        setChangingConfigurations(isChangingConfigurations());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause is called");
+        Timber.d("onPause is called");
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
         setChangingConfigurations(isChangingConfigurations());
-        removeListeners();
     }
 
     private void setChangingConfigurations(boolean changingConfigurations) {
         TrainRepository.getInstance().setConfigurationChange(changingConfigurations);
-        if (BrandRepository.getNullableInstance() != null) {
-            BrandRepository.getInstance().setConfigurationChange(changingConfigurations);
-        }
+        BrandRepository.getInstance().setConfigurationChange(changingConfigurations);
         CategoryRepository.getInstance().setConfigurationChange(changingConfigurations);
-    }
-
-    private void removeListeners() {
-        TrainRepository.getInstance().removeListener();
-        if (BrandRepository.getNullableInstance() != null) {
-            BrandRepository.getInstance().removeListener();
-        }
-        CategoryRepository.getInstance().removeListener();
-    }
-
-    private void attachListeners() {
-        TrainRepository.getInstance().attachListener();
-        if (BrandRepository.getNullableInstance() != null) {
-            BrandRepository.getInstance().attachListener();
-        }
-        CategoryRepository.getInstance().attachListener();
     }
 
     @Override

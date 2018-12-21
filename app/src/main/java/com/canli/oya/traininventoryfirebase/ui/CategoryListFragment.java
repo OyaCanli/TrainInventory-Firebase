@@ -75,7 +75,7 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
         coordinator = getActivity().findViewById(R.id.coordinator);
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         mViewModel.initializeCategoryRepo(this);
-        mViewModel.getCategoryList().observe(getActivity(), new Observer<List<String>>() {
+        mViewModel.getCategoryList().observe(this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> categoryEntries) {
                 if (categoryEntries != null) {

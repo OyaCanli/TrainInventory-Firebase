@@ -1,7 +1,6 @@
 package com.canli.oya.traininventoryfirebase.repositories;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.firebaselivedata.CategoryListLiveData;
 import com.canli.oya.traininventoryfirebase.utils.FirebaseUtils;
@@ -9,17 +8,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import timber.log.Timber;
+
 public class CategoryRepository {
 
     private static CategoryRepository sInstance;
-    private static final String TAG = "CategoryRepository";
-    private final CategoryListLiveData categoryList;
+    private CategoryListLiveData categoryList;
     private boolean categoryIsUsed;
     private CategoryUseListener mCallback;
 
     private CategoryRepository() {
-        Log.d(TAG, "new instance of CategoryRepository");
-        categoryList = new CategoryListLiveData(FirebaseUtils.getCategoriesRef());
+        Timber.d("new instance of CategoryRepository");
     }
 
     public static CategoryRepository getInstance() {
@@ -36,6 +35,9 @@ public class CategoryRepository {
     }
 
     public CategoryListLiveData getCategoryList() {
+        if (categoryList == null) {
+            categoryList = new CategoryListLiveData(FirebaseUtils.getCategoriesRef());
+        }
         return categoryList;
     }
 
@@ -44,6 +46,7 @@ public class CategoryRepository {
     }
 
     public void deleteCategory(final String category) {
+        FirebaseUtils.getBrandsRef().child(category).removeValue();
 
     }
 
@@ -68,18 +71,6 @@ public class CategoryRepository {
     public void setConfigurationChange(boolean configurationChange) {
         if (categoryList != null) {
             categoryList.setChangingConfigutations(configurationChange);
-        }
-    }
-
-    public void removeListener() {
-        if (categoryList != null) {
-            categoryList.removeListener();
-        }
-    }
-
-    public void attachListener() {
-        if (categoryList != null) {
-            categoryList.attachListener();
         }
     }
 }

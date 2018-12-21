@@ -1,7 +1,6 @@
 package com.canli.oya.traininventoryfirebase.repositories;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.firebaselivedata.BrandListLiveData;
 import com.canli.oya.traininventoryfirebase.model.Brand;
@@ -10,16 +9,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import timber.log.Timber;
+
 public class BrandRepository {
 
     private static BrandRepository sInstance;
-    private static final String TAG = "BrandRepository";
     private BrandListLiveData brandList;
     private boolean brandIsUsed;
     private BrandUseListener mCallback;
 
     private BrandRepository() {
-        Log.d(TAG, "new instance of BrandRepository");
+        Timber.d("new instance of BrandRepository");
     }
 
     public static BrandRepository getInstance() {
@@ -33,10 +33,6 @@ public class BrandRepository {
 
     public void setListener(BrandUseListener mCallback) {
         this.mCallback = mCallback;
-    }
-
-    public static BrandRepository getNullableInstance() {
-        return sInstance;
     }
 
     public BrandListLiveData getBrandList() {
@@ -80,18 +76,6 @@ public class BrandRepository {
     public void setConfigurationChange(boolean configurationChange) {
         if (brandList != null) {
             brandList.setChangingConfigutations(configurationChange);
-        }
-    }
-
-    public void removeListener() {
-        if (brandList != null) {
-            brandList.removeListener();
-        }
-    }
-
-    public void attachListener() {
-        if (brandList != null) {
-            brandList.attachListener();
         }
     }
 

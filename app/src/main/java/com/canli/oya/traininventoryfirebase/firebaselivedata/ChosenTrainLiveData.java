@@ -1,14 +1,13 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
-import android.util.Log;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import timber.log.Timber;
+
 public class ChosenTrainLiveData extends FirebaseBaseLiveData<DataSnapshot> {
-    private static final String LOG_TAG = "ChosenTrainLiveData";
 
     private final DatabaseReference reference;
     private final MyValueEventListener listener = new MyValueEventListener();
@@ -18,7 +17,7 @@ public class ChosenTrainLiveData extends FirebaseBaseLiveData<DataSnapshot> {
     }
 
     @Override
-    void removePendingListener() {
+    void removeListener() {
         reference.removeEventListener(listener);
     }
 
@@ -35,7 +34,7 @@ public class ChosenTrainLiveData extends FirebaseBaseLiveData<DataSnapshot> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Log.e(LOG_TAG, "Can't listen to reference " + reference, databaseError.toException());
+            Timber.d("Can't listen to reference " + reference + databaseError.toException());
         }
     }
 }

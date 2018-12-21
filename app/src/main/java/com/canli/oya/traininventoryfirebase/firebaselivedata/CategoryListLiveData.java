@@ -1,9 +1,7 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
-import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -14,37 +12,27 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryListLiveData extends LiveData<List<String>> {
-    private static final String LOG_TAG = "CategoryListLiveData";
+import timber.log.Timber;
+
+public class CategoryListLiveData extends FirebaseBaseLiveData<List<String>> {
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
     private List<String> categoryList;
-    private boolean isChangingConfigutations;
 
     public CategoryListLiveData(DatabaseReference ref) {
         this.query = ref;
     }
 
-
     public void removeListener() {
-        if (!isChangingConfigutations) {
-            query.removeEventListener(listener);
-            Log.d(LOG_TAG, "listener removed");
-            if (categoryList != null) categoryList.clear();
-        }
+        Timber.d("listener removed");
+        query.removeEventListener(listener);
+        if (categoryList != null) categoryList.clear();
     }
 
     public void attachListener() {
-        if (!isChangingConfigutations) {
-            query.addChildEventListener(listener);
-            Log.d(LOG_TAG, "listener attached");
-        } else {
-            isChangingConfigutations = false;
-        }
-    }
+        query.addChildEventListener(listener);
+        Timber.d("listener attached");
 
-    public void setChangingConfigutations(boolean changingConfigutations) {
-        isChangingConfigutations = changingConfigutations;
     }
 
     private class MyValueEventListener implements ChildEventListener {
@@ -54,7 +42,6 @@ public class CategoryListLiveData extends LiveData<List<String>> {
             if (categoryList == null) categoryList = new ArrayList<>();
             categoryList.add(dataSnapshot.getValue(String.class));
             setValue(categoryList);
-            Log.d(LOG_TAG, "onChildAdded. list size: " + categoryList.size());
         }
 
         @Override
@@ -64,7 +51,6 @@ public class CategoryListLiveData extends LiveData<List<String>> {
         @Override
         public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
             categoryList.remove(dataSnapshot.getKey());
-            Log.d(LOG_TAG, "onChildRemoved. list size: " + categoryList.size());
         }
 
         @Override
@@ -73,7 +59,7 @@ public class CategoryListLiveData extends LiveData<List<String>> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Timber.e("Can't listen to query " + query + databaseError.toException());
         }
     }
 }

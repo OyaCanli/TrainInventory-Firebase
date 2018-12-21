@@ -1,15 +1,14 @@
 package com.canli.oya.traininventoryfirebase.firebaselivedata;
 
-import android.util.Log;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import timber.log.Timber;
+
 public class FetchOnceLiveData extends FirebaseBaseLiveData<DataSnapshot> {
-    private static final String LOG_TAG = "FetchOnceLiveData";
 
     private final Query query;
     private final MyValueEventListener listener = new MyValueEventListener();
@@ -19,7 +18,7 @@ public class FetchOnceLiveData extends FirebaseBaseLiveData<DataSnapshot> {
     }
 
     @Override
-    void removePendingListener() {
+    void removeListener() {
         query.removeEventListener(listener);
     }
 
@@ -36,7 +35,7 @@ public class FetchOnceLiveData extends FirebaseBaseLiveData<DataSnapshot> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Timber.d("Can't listen to query " + query + databaseError.toException());
         }
     }
 }

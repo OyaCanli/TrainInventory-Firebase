@@ -18,7 +18,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +38,8 @@ import com.canli.oya.traininventoryfirebase.viewmodel.MainViewModel;
 import java.io.File;
 import java.io.IOException;
 
+import timber.log.Timber;
+
 import static android.app.Activity.RESULT_OK;
 
 public class AddBrandFragment extends Fragment implements View.OnClickListener, UploadImageAsyncTask.ImageUploadListener {
@@ -54,7 +55,6 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener, 
     private boolean imageClicked;
     private Brand mBrandToUpdate;
     private Brand mChosenBrand;
-    private static final String TAG = "AddBrandFragment";
 
     private final DialogInterface.OnClickListener mDialogClickListener = new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int item) {
@@ -318,7 +318,7 @@ public class AddBrandFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onImageUploaded(Uri imageUri, boolean loadingSuccessful) {
-        Log.d(TAG, "onImageUploaded called");
+        Timber.d("onImageUploaded called");
         if(loadingSuccessful){
             if(isEdit) {
                 String previousUrl = mBrandToUpdate.getBrandLogoUri();

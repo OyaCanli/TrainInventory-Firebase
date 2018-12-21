@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,12 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 public class TrainListFragment extends Fragment implements TrainAdapter.TrainItemClickListener {
 
     private TrainAdapter mAdapter;
     private List<MinimalTrain> mTrainList;
     private FragmentTrainListBinding binding;
-    private static final String TAG = "TrainListFragment";
     private Map<String, String> mSearchLookUp;
 
     public TrainListFragment() {
@@ -76,24 +76,21 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 case Constants.TRAINS_OF_BRAND: {
                     String brandName = bundle.getString(Constants.BRAND_NAME);
                     getActivity().setTitle(getString(R.string.trains_of_the_brand, brandName));
-                    mViewModel.getTrainsFromThisBrand(brandName).observe(getActivity(), new Observer<List<MinimalTrain>>() {
+                    mViewModel.getTrainsFromThisBrand(brandName).observe(this, new Observer<List<MinimalTrain>>() {
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries != null) {
-                                Log.d(TAG, "onChange is called,data is not null");
                                 binding.setIsLoading(false);
                                 if (trainEntries.isEmpty()) {
-                                    Log.d(TAG, "onChange is called, list is empty");
                                     binding.setIsEmpty(true);
                                     binding.setEmptyMessage(getString(R.string.no_train_for_this_brand));
                                 } else {
-                                    Log.d(TAG, "onChange is called, list is not empty");
                                     binding.setIsEmpty(false);
                                     mAdapter.setTrains(trainEntries);
                                     mTrainList = trainEntries;
                                 }
                             } else {
-                                Log.d(TAG, "onChange is called but data is null");
+                                Timber.d("onChange is called but data is null");
                             }
                         }
                     });
@@ -102,7 +99,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 case Constants.TRAINS_OF_CATEGORY: {
                     String categoryName = bundle.getString(Constants.CATEGORY_NAME);
                     getActivity().setTitle(getString(R.string.all_from_this_Category, categoryName));
-                    mViewModel.getTrainsFromThisCategory(categoryName).observe(getActivity(), new Observer<List<MinimalTrain>>() {
+                    mViewModel.getTrainsFromThisCategory(categoryName).observe(this, new Observer<List<MinimalTrain>>() {
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries != null) {
@@ -123,7 +120,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 default: {
                     //If the list is going to be use for showing all trains, which is the default behaviour
                     getActivity().setTitle(getString(R.string.all_trains));
-                    mViewModel.getTrainList().observe(getActivity(), new Observer<List<MinimalTrain>>() {
+                    mViewModel.getTrainList().observe(this, new Observer<List<MinimalTrain>>() {
                         @Override
                         public void onChanged(@Nullable List<MinimalTrain> trainEntries) {
                             if (trainEntries != null) {
@@ -142,7 +139,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 }
             }
         }
-        mViewModel.loadSearchLookUp().observe(getActivity(), new Observer<Map<String, String>>() {
+        mViewModel.loadSearchLookUp().observe(this, new Observer<Map<String, String>>() {
             @Override
             public void onChanged(@Nullable Map<String, String> searchMap) {
                 mSearchLookUp = searchMap;
@@ -233,7 +230,7 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
         List<MinimalTrain> filteredTrainList = new ArrayList<>();
         for (MinimalTrain minimalTrain : mTrainList) {
             if (resultIds.contains(minimalTrain.getTrainId())) {
-                Log.d(TAG, "trainID" + minimalTrain.getTrainId());
+                Timber.d("trainID" + minimalTrain.getTrainId());
                 filteredTrainList.add(minimalTrain);
             }
         }

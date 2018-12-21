@@ -4,7 +4,6 @@ import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.canli.oya.traininventoryfirebase.firebaselivedata.ChosenTrainLiveData;
 import com.canli.oya.traininventoryfirebase.firebaselivedata.FetchOnceLiveData;
@@ -23,16 +22,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 public class TrainRepository {
 
     private static TrainRepository sInstance;
-    private static final String TAG = "TrainRepository";
     private String trainPushId;
     private TrainListLiveData minimalTrains;
     private SearchMapLiveData searchLookUp;
 
     private TrainRepository() {
-        Log.d(TAG, "new instance of TrainRepository");
+        Timber.d("new instance of TrainRepository");
     }
 
     public static TrainRepository getInstance() {
@@ -148,12 +148,12 @@ public class TrainRepository {
                     .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "image successfully deleted");
+                            Timber.d("image successfully deleted");
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "error during deleting image");
+                            Timber.e("error during deleting image");
                         }
                     });
         }
@@ -196,14 +196,6 @@ public class TrainRepository {
         }
     }
 
-    public void attachListener() {
-        if (minimalTrains != null) {
-            minimalTrains.attachListener();
-        }
-        if (searchLookUp != null) {
-            searchLookUp.attachListener();
-        }
-    }
 
     private class TrainListDeserializer implements Function<DataSnapshot, List<MinimalTrain>> {
         @Override
