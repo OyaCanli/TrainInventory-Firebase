@@ -20,6 +20,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
@@ -84,8 +86,11 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
                         Timber.d("onChange is called, list is empty");
                         binding.included.setIsEmpty(true);
                         binding.included.setEmptyMessage(getString(R.string.no_categories_found));
+                        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
+                        binding.included.emptyImage.startAnimation(animation);
                     } else {
                         Timber.d("onChange is called, list is not empty");
+                        binding.included.emptyImage.clearAnimation();
                         mAdapter.setCategories(categoryEntries);
                         mCategories = categoryEntries;
                         binding.included.setIsEmpty(false);

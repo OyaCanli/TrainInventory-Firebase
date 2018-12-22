@@ -17,6 +17,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.canli.oya.traininventoryfirebase.R;
@@ -86,8 +88,11 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                                     Timber.d("onChange is called, list is empty");
                                     binding.setIsEmpty(true);
                                     binding.setEmptyMessage(getString(R.string.no_train_for_this_brand));
+                                    Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
+                                    binding.emptyImage.startAnimation(animation);
                                 } else {
                                     Timber.d("onChange is called, list is not empty");
+                                    binding.emptyImage.clearAnimation();
                                     binding.setIsEmpty(false);
                                     mAdapter.setTrains(trainEntries);
                                     mTrainList = trainEntries;
@@ -110,7 +115,10 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                                 if (trainEntries.isEmpty()) {
                                     binding.setIsEmpty(true);
                                     binding.setEmptyMessage(getString(R.string.no_items_for_this_category));
+                                    Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
+                                    binding.emptyImage.startAnimation(animation);
                                 } else {
+                                    binding.emptyImage.clearAnimation();
                                     binding.setIsEmpty(false);
                                     mAdapter.setTrains(trainEntries);
                                     mTrainList = trainEntries;
@@ -131,7 +139,10 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                                 if (trainEntries.isEmpty()) {
                                     binding.setIsEmpty(true);
                                     binding.setEmptyMessage(getString(R.string.no_trains_found));
+                                    Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
+                                    binding.emptyImage.startAnimation(animation);
                                 } else {
+                                    binding.emptyImage.clearAnimation();
                                     binding.setIsEmpty(false);
                                     mAdapter.setTrains(trainEntries);
                                     mTrainList = trainEntries;
