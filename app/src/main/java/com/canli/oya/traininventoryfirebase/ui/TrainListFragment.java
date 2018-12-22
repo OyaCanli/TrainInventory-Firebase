@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -41,6 +42,19 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
     private List<MinimalTrain> mTrainList;
     private FragmentTrainListBinding binding;
     private Map<String, String> mSearchLookUp;
+    private final Handler handler = new Handler();
+    private boolean mIsEmpty;
+    private Runnable setEmpty = new Runnable() {
+        @Override
+        public void run() {
+            Timber.d("Runnable setEmpty is executed");
+            if (mIsEmpty) {
+                binding.setIsEmpty(true);
+                Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
+                binding.emptyImage.startAnimation(animation);
+            }
+        }
+    };
 
     public TrainListFragment() {
         setRetainInstance(true);
@@ -86,11 +100,11 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                                 binding.setIsLoading(false);
                                 if (trainEntries.isEmpty()) {
                                     Timber.d("onChange is called, list is empty");
-                                    binding.setIsEmpty(true);
                                     binding.setEmptyMessage(getString(R.string.no_train_for_this_brand));
-                                    Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
-                                    binding.emptyImage.startAnimation(animation);
+                                    setIsEmpty(true);
+                                    handler.postDelayed(setEmpty, 300);
                                 } else {
+                                    setIsEmpty(false);
                                     Timber.d("onChange is called, list is not empty");
                                     binding.emptyImage.clearAnimation();
                                     binding.setIsEmpty(false);
@@ -113,11 +127,12 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                             if (trainEntries != null) {
                                 binding.setIsLoading(false);
                                 if (trainEntries.isEmpty()) {
-                                    binding.setIsEmpty(true);
+                                    Timber.d("onChange is called, list is empty");
                                     binding.setEmptyMessage(getString(R.string.no_items_for_this_category));
-                                    Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
-                                    binding.emptyImage.startAnimation(animation);
+                                    setIsEmpty(true);
+                                    handler.postDelayed(setEmpty, 300);
                                 } else {
+                                    setIsEmpty(false);
                                     binding.emptyImage.clearAnimation();
                                     binding.setIsEmpty(false);
                                     mAdapter.setTrains(trainEntries);
@@ -137,11 +152,12 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                             if (trainEntries != null) {
                                 binding.setIsLoading(false);
                                 if (trainEntries.isEmpty()) {
-                                    binding.setIsEmpty(true);
+                                    Timber.d("onChange is called, list is empty");
                                     binding.setEmptyMessage(getString(R.string.no_trains_found));
-                                    Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
-                                    binding.emptyImage.startAnimation(animation);
+                                    setIsEmpty(true);
+                                    handler.postDelayed(setEmpty, 300);
                                 } else {
+                                    setIsEmpty(false);
                                     binding.emptyImage.clearAnimation();
                                     binding.setIsEmpty(false);
                                     mAdapter.setTrains(trainEntries);
@@ -159,6 +175,10 @@ public class TrainListFragment extends Fragment implements TrainAdapter.TrainIte
                 mSearchLookUp = searchMap;
             }
         });
+    }
+
+    private void setIsEmpty(boolean isEmpty) {
+        mIsEmpty = isEmpty;
     }
 
     @Override

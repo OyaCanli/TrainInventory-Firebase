@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -45,6 +46,19 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
     private MainViewModel mViewModel;
     private CoordinatorLayout coordinator;
     private String categoryToErase;
+    private final Handler handler = new Handler();
+    private boolean mIsEmpty;
+    private Runnable setEmpty = new Runnable() {
+        @Override
+        public void run() {
+            Timber.d("Runnable setEmpty is executed");
+            if (mIsEmpty) {
+                binding.included.setIsEmpty(true);
+                Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
+                binding.included.emptyImage.startAnimation(animation);
+            }
+        }
+    };
 
     public CategoryListFragment() {
         setRetainInstance(true);
@@ -84,11 +98,11 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
                     binding.included.setIsLoading(false);
                     if (categoryEntries.isEmpty()) {
                         Timber.d("onChange is called, list is empty");
-                        binding.included.setIsEmpty(true);
                         binding.included.setEmptyMessage(getString(R.string.no_categories_found));
-                        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_from_left);
-                        binding.included.emptyImage.startAnimation(animation);
+                        setIsEmpty(true);
+                        handler.postDelayed(setEmpty, 300);
                     } else {
+                        setIsEmpty(false);
                         Timber.d("onChange is called, list is not empty");
                         binding.included.emptyImage.clearAnimation();
                         mAdapter.setCategories(categoryEntries);
@@ -119,6 +133,10 @@ public class CategoryListFragment extends Fragment implements CategoryAdapter.Ca
                 mViewModel.checkIfCategoryUsed(categoryToErase);
             }
         }).attachToRecyclerView(binding.included.list);
+    }
+
+    private void setIsEmpty(boolean isEmpty) {
+        mIsEmpty = isEmpty;
     }
 
     @Override
