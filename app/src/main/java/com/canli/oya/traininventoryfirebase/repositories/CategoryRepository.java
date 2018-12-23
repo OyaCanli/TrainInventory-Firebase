@@ -44,7 +44,7 @@ public class CategoryRepository {
     }
 
     public void deleteCategory(final String category) {
-
+        FirebaseUtils.getCategoriesRef().child(category).removeValue();
     }
 
     public void checkIfCategoryUsed(String category) {
