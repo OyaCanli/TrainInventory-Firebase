@@ -22,6 +22,7 @@ import com.canli.oya.traininventoryfirebase.databinding.ActivityMainBinding;
 import com.canli.oya.traininventoryfirebase.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import timber.log.Timber;
 
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
 
